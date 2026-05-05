@@ -27,7 +27,9 @@ The outcome is a restaurant-first architecture, not a supermarket extension.
 
 2. **Write constraints to POS**
    - Never write directly to POS domain tables from web app.
-   - Only write to dedicated POS `incoming_orders` table through controlled integration service.
+   - Only write orders through an approved POS-owned write contract.
+   - Current discovered write contract is stored procedure `dbo.PS_AddApplicationCustomerOrder`.
+   - A dedicated POS `incoming_orders` table remains the preferred future contract if the POS team can add it.
 
 3. **Tenant and branch boundaries**
    - Tenant data must be isolated using PostgreSQL RLS and service-level checks.
@@ -86,10 +88,11 @@ The outcome is a restaurant-first architecture, not a supermarket extension.
 4. Worker upserts canonical entities into PostgreSQL mirror tables.
 5. Customer UI reads only from web app DB.
 6. Checkout recalculates totals and writes order into web app DB.
-7. Integration service exports order to POS `incoming_orders`.
-8. POS reads `incoming_orders` and continues kitchen/POS processing.
-9. POS writes order status changes to `change_log`.
-10. Sync workers replay order status events into the web app DB for tracking, dashboards, notifications, and delivery workflows.
+7. Integration service exports order through the approved POS write contract.
+8. Current MVP write path calls `dbo.PS_AddApplicationCustomerOrder` with customer name, mobile, address, delivery service code, and order code.
+9. POS receives the order and continues kitchen/POS processing.
+10. POS writes order status changes to `change_log`.
+11. Sync workers replay order status events into the web app DB for tracking, dashboards, notifications, and delivery workflows.
 
 Initial POS views available for bootstrap and mirror reads:
 
@@ -98,7 +101,8 @@ Initial POS views available for bootstrap and mirror reads:
 
 ## Non-Negotiable Guard Rails
 
-- No direct writes to POS business tables except `incoming_orders`.
+- No direct writes to POS business tables.
+- Only call the approved POS order write contract (`dbo.PS_AddApplicationCustomerOrder` now, `incoming_orders` if added later).
 - Respect soft deletes and inactive flags from POS during sync.
 - Alert on 3 or more consecutive sync failures.
 - Use least-privileged read-only POS DB credentials for sync reads.
@@ -139,7 +143,7 @@ Initial POS views available for bootstrap and mirror reads:
 ### Phase 3: Order Write Path
 
 - Introduce restaurant checkout pricing engine and order fulfillment types.
-- Export orders into POS `incoming_orders`.
+- Export orders through `dbo.PS_AddApplicationCustomerOrder` for MVP, or `incoming_orders` if POS adds the richer table contract.
 
 ### Phase 4: Decommission Grocery Flow
 

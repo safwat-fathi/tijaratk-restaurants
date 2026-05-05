@@ -202,7 +202,8 @@ Send customer orders from the web app into POS reliably.
 
 ### Key Outcomes
 
-- Web orders reach POS through `incoming_orders`.
+- Web orders reach POS through the approved POS order write contract.
+- Current discovered write contract is `dbo.PS_AddApplicationCustomerOrder`.
 - POS downtime does not lose orders.
 - Retries do not create duplicates.
 
@@ -210,7 +211,12 @@ Send customer orders from the web app into POS reliably.
 
 - Local order creation.
 - POS export queue and state.
-- Incoming-order payload adapter.
+- POS order procedure adapter.
+- Procedure call support for `dbo.PS_AddApplicationCustomerOrder` parameters: customer name, customer mobile, customer address, delivery service code, and order code.
+- Validation that selected delivery service code comes from synced POS delivery service data.
+- Validation that selected order code comes from synced POS menu data.
+- Confirmation with POS team on multi-item, quantity, variant, and modifier behavior.
+- Future support for `incoming_orders` if POS team adds a richer idempotent payload table.
 - Idempotency key.
 - Retry policy.
 - Export failure visibility.

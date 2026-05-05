@@ -305,6 +305,20 @@ Add/adjust conceptual columns:
 - `guest_count` INT NULL
 - `subtotal`, `discount_total`, `delivery_fee`, `service_fee`, `tax_total`, `total`
 - `pricing_snapshot` JSONB (rule versions and computed lines)
+- `pos_export_status` enum: `pending`, `exported`, `failed`, `retry_scheduled`
+- `pos_export_attempts` INT DEFAULT 0
+- `pos_last_export_error` TEXT NULL
+
+POS export mapping:
+
+- Current procedure: `dbo.PS_AddApplicationCustomerOrder`.
+- `@CustomerName` comes from order/customer snapshot name.
+- `@CustomerMobile` comes from order/customer snapshot phone.
+- `@CustomerAddress` comes from delivery address snapshot.
+- `@DeliveryServiceCode` comes from selected synced delivery service remote code.
+- `@OrderCode` comes from selected synced menu item remote code.
+- If the procedure returns or exposes a remote POS order ID, store it in `external_mappings` with `entity_type = 'order'`.
+- If no remote ID is returned, order status sync must define how to correlate local order to POS order.
 
 ### `order_items` (evolve existing)
 

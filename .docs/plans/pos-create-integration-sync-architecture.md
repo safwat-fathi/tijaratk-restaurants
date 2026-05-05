@@ -10,7 +10,9 @@ Implement a robust integration layer where external POS is the Source of Truth (
 
 - POS owns menu/category/modifier/price state.
 - Web app owns customer-facing read performance and checkout orchestration.
-- Web app writes to POS only through `incoming_orders` table.
+- Web app writes orders to POS only through an approved POS-owned write contract.
+- Current discovered write contract is stored procedure `dbo.PS_AddApplicationCustomerOrder`.
+- A dedicated `incoming_orders` table remains the preferred future contract if the POS team can add it, because it improves idempotency, retries, and observability.
 
 ### Adapter Policy
 
@@ -35,14 +37,52 @@ Current POS read views discovered:
    - columns: `BranchName`, `DeliveryServiceCode`, `DeliveryServiceName`, `DeliveryServiceAmount`
    - maps to branch, delivery zone/service external code, delivery service name, and delivery fee amount
 
-Required POS write/replay tables to request from the POS team:
+Current POS order write procedure discovered:
+
+1. `dbo.PS_AddApplicationCustomerOrder`
+   - current procedure to add an application customer order into POS
+   - parameters:
+     - `@CustomerName` varchar
+     - `@CustomerMobile` varchar
+     - `@CustomerAddress` varchar
+     - `@DeliveryServiceCode` int
+     - `@OrderCode` int
+   - example:
+
+```sql
+EXECUTE dbo.PS_AddApplicationCustomerOrder
+  'صفوت فتحي',
+  '01143341684',
+  'الحي4 - مجاورة7',
+  50,
+  100;
+```
+
+Procedure mapping:
+
+| Procedure parameter | Local source | Notes |
+|---------------------|--------------|-------|
+| `@CustomerName` | order/customer snapshot name | required for POS customer order creation |
+| `@CustomerMobile` | order/customer snapshot phone | normalize phone before export |
+| `@CustomerAddress` | delivery address snapshot | required for delivery orders; define fallback for pickup/dine-in if POS requires value |
+| `@DeliveryServiceCode` | selected delivery service remote code | comes from `PS_ApplicationDeliveryServices_V.DeliveryServiceCode` |
+| `@OrderCode` | selected menu item remote code | comes from `PS_ApplicationOrders_V.OrderCode` |
+
+Important limitation:
+
+- The discovered procedure accepts one `@OrderCode`, which appears to represent one menu item per call.
+- We must confirm with the POS team how multi-item orders, quantities, variants, and modifiers are represented.
+- If the procedure only supports single-item orders, the adapter must either call it once per order line or request a richer order insertion contract.
+- The preferred long-term contract is still an `incoming_orders` table or richer stored procedure that accepts an idempotency key and full order payload.
+
+Required POS replay tables to request from the POS team:
 
 1. `change_log`
    - append-only events
    - includes menu, availability, and order status events
    - columns: `id`, `entity_type`, `entity_id`, `operation`, `changed_at`, `branch_ref`, `payload_json`
 
-2. `incoming_orders`
+2. `incoming_orders` (preferred future write contract)
    - receives orders from web app
    - columns: `id`, `external_order_key`, `tenant_ref`, `branch_ref`, `payload_json`, `status`, `created_at`, `processed_at`, `error`
 
@@ -149,8 +189,18 @@ Why not only `updated_at > lastSync`:
 1. Customer submits order.
 2. Web app recalculates final price from mirrored DB.
 3. Web app stores order locally as system-of-engagement record.
-4. Export job writes to POS `incoming_orders` with idempotency key (`external_order_key`).
-5. POS consumes and updates status independently.
+4. Export job calls the approved POS write contract.
+5. Current MVP write path calls `dbo.PS_AddApplicationCustomerOrder` using customer snapshot, delivery service code, and POS order code.
+6. If `incoming_orders` is added later, export switches to writing the full order payload with idempotency key (`external_order_key`).
+7. POS consumes/processes the order and updates status independently.
+
+Order export requirements:
+
+- Store each POS export attempt and result locally.
+- Keep local idempotency state even if the current stored procedure does not accept an idempotency key.
+- If the stored procedure does not return a POS order ID, use order-status sync and/or POS team enhancements to resolve remote references.
+- Do not call the procedure directly from checkout request handling; use an export job so POS failures do not block local order creation.
+- Confirm multi-item and quantity behavior before production rollout.
 
 ## Order Status Sync Flow
 
@@ -208,7 +258,8 @@ Alerting:
 ## Security Model
 
 - Read-only MySQL user for sync reads.
-- Separate write user with scope limited to `incoming_orders` only.
+- Separate write user with scope limited to the approved POS order write contract only.
+- For the current procedure path, grant execute permission only on `dbo.PS_AddApplicationCustomerOrder` and no direct table writes.
 - Credentials per environment and partner, managed in secrets store.
 - Structured audit logs for all POS integration operations.
 
@@ -235,7 +286,8 @@ Prisma usage:
 
 - `MirrorRepository` should use Prisma Client transactions for local PostgreSQL writes.
 - Raw SQL should be limited to specialized database capabilities, not normal menu/order CRUD.
-- POS MySQL reads remain outside Prisma unless a separate Prisma datasource is explicitly chosen later; the default approach is a dedicated POS DB service/adapter.
+- POS DB reads/writes remain outside Prisma unless a separate Prisma datasource is explicitly chosen later; the default approach is a dedicated POS DB service/adapter.
+- The current POS contract uses `dbo` procedure naming, so the adapter must support the actual POS database engine/driver in use rather than assuming PostgreSQL.
 
 ## Webhook + Poll Hybrid
 
@@ -246,7 +298,7 @@ Prisma usage:
 
 ## Key Guard Rails (Enforced)
 
-- No direct POS writes except `incoming_orders`.
+- No direct POS writes except the approved POS order write contract (`dbo.PS_AddApplicationCustomerOrder` now, `incoming_orders` if added later).
 - Soft delete and inactive states must propagate to mirror.
 - Checkout price must come from mirrored DB, not client payload.
 - Alerting and run bookkeeping are mandatory from initial rollout.
@@ -256,5 +308,5 @@ Prisma usage:
 - Integration can add a new POS partner by implementing adapter only.
 - Sync is idempotent and replay-safe.
 - Lag and failures are visible with actionable alerts.
-- Orders reach POS reliably without duplicates.
+- Orders reach POS reliably without duplicates within the limits of the POS write contract.
 - POS order status changes update local tracking reliably.

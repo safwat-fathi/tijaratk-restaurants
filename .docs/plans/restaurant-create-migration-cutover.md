@@ -75,7 +75,7 @@ Exit criteria:
 
 1. Implement fulfillment-aware order model (`delivery`, `pickup`, `dine_in`).
 2. Recalculate pricing server-side from mirror data.
-3. Write orders to local DB and export to POS `incoming_orders`.
+3. Write orders to local DB and export to POS through `dbo.PS_AddApplicationCustomerOrder` for MVP.
 
 Exit criteria:
 
@@ -134,7 +134,9 @@ Exit criteria:
    - manipulated client price rejected/overridden
 
 5. **Order export reliability tests**
-   - retries do not create duplicate incoming POS orders
+   - retries do not create duplicate POS orders within the limits of the stored procedure contract
+   - procedure export uses synced `DeliveryServiceCode` and `OrderCode`
+   - multi-item and quantity behavior is validated with the POS team before production rollout
 
 6. **Order status sync tests**
    - POS `change_log` status events update local order state idempotently
