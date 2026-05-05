@@ -1,0 +1,25 @@
+export enum OrderStatus {
+  DRAFT = 'draft',
+  CONFIRMED = 'confirmed',
+  OUT_FOR_DELIVERY = 'out_for_delivery',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+  REJECTED_BY_CUSTOMER = 'rejected_by_customer',
+}
+
+export enum ReplacementDecisionStatus {
+  NONE = 'none',
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
+export enum OrderType {
+  CATALOG = 'catalog',
+  FREE_TEXT = 'free_text',
+}
+
+export enum PricingMode {
+  AUTO = 'auto',
+  MANUAL = 'manual',
+}

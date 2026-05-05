@@ -1,0 +1,168 @@
+import StoreHeader, { resolveTenantCategoryMeta } from "./_components/StoreHeader";
+
+import OrderForm from "./_components/OrderForm";
+
+import { tenantsService } from "@/services/api/tenants.service";
+import { productsService } from "@/services/api/products.service";
+import { ordersService } from "@/services/api/orders.service";
+
+// Types
+import { Tenant } from "@/types/models/tenant";
+import {
+	Product,
+	PublicProductCategory,
+	PublicProductsMeta,
+} from "@/types/models/product";
+import { Order } from "@/types/models/order";
+import { notFound } from "next/navigation";
+import { Metadata } from "next";
+import { getCustomerProfileBySlugFromCookie } from "@/lib/tracking/customer-tracking-cookie";
+
+type Props = {
+	params: Promise<{ slug: string }>;
+	searchParams: Promise<{ reorder?: string; category?: string }>;
+};
+
+// Fetch data
+async function getTenant(slug: string): Promise<Tenant | null> {
+	const response = await tenantsService.getPublicTenant(slug);
+
+	if (!response.success || !response.data) return null;
+	return response.data;
+}
+
+const EMPTY_PRODUCTS_META: PublicProductsMeta = {
+	total: 0,
+	page: 1,
+	limit: 20,
+	last_page: 1,
+	has_next: false,
+};
+
+async function getInitialProducts(slug: string, category?: string): Promise<{
+	products: Product[];
+	meta: PublicProductsMeta;
+}> {
+	const response = await productsService.getPublicProducts(slug, {
+		category,
+		page: 1,
+		limit: 20,
+	});
+
+	if (!response.success || !response.data) {
+		return {
+			products: [],
+			meta: EMPTY_PRODUCTS_META,
+		};
+	}
+
+	return {
+		products: response.data.data,
+		meta: response.data.meta,
+	};
+}
+
+async function getPublicCategories(
+	slug: string,
+): Promise<PublicProductCategory[]> {
+	const response = await productsService.getPublicProductCategories(slug);
+	if (!response.success || !response.data) return [];
+	return response.data;
+}
+
+async function getOrder(token?: string): Promise<Order | null> {
+	if (!token) return null;
+	try {
+		const response = await ordersService.getOrderByPublicToken(token);
+		if (response.success && response.data) {
+			return response.data;
+		}
+		return null;
+	} catch {
+		return null;
+	}
+}
+
+export async function generateMetadata(
+	{ params }: Props,
+): Promise<Metadata> {
+	const { slug } = await params;
+	const tenant = await getTenant(slug);
+
+	if (!tenant) return { title: "المتجر غير موجود" };
+
+	const categoryLabel = resolveTenantCategoryMeta(tenant.category).labels.ar;
+	const title = `${tenant.name} | ${categoryLabel}`;
+	const description = `اطلب الآن من ${tenant.name}، متخصصون في ${categoryLabel}. تصفح المنتجات واطلب بسهولة عبر تجارتك.`;
+
+	return {
+		title,
+		description,
+		keywords: [tenant.name, categoryLabel, "تجارتك", "طلب أونلاين", "قائمة المنتجات"],
+		openGraph: {
+			title,
+			description,
+			type: "website",
+			url: `https://tijaratk.com/${slug}`,
+			siteName: "تجارتك",
+			images: [
+				{
+					url: "/logo.png",
+					width: 800,
+					height: 600,
+					alt: tenant.name,
+				},
+			],
+		},
+		twitter: {
+			card: "summary_large_image",
+			title,
+			description,
+			images: ["/logo.png"],
+		},
+	};
+}
+
+export default async function StorePage({ params, searchParams }: Props) {
+	const { slug } = await params;
+	const { reorder, category } = await searchParams;
+
+	const tenant = await getTenant(slug);
+	if (!tenant || !tenant.id) {
+		notFound();
+	}
+
+	const [{ products, meta }, categories, initialOrder, savedCustomerProfile] =
+		await Promise.all([
+			getInitialProducts(slug, category),
+			getPublicCategories(slug),
+			getOrder(reorder),
+			getCustomerProfileBySlugFromCookie(tenant.slug),
+		]);
+
+	return (
+		<div className="w-full max-w-md mx-auto min-h-screen bg-gray-50">
+			<StoreHeader tenant={tenant} />
+			{/* <WriteOrderFAB /> */}
+
+			<div>
+				{products.length === 0 && (
+					<div className="text-center text-gray-500 my-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm mx-4">
+						<p className="font-medium text-gray-900">لا توجد منتجات بعد.</p>
+						<p className="text-sm">فقط اكتب طلبك بالأسفل.</p>
+					</div>
+				)}
+
+				<OrderForm
+					tenantSlug={tenant.slug}
+					initialCategory={category}
+					initialProducts={products}
+					initialProductsMeta={meta}
+					initialCategories={categories}
+					initialOrder={initialOrder}
+					savedCustomerProfile={savedCustomerProfile}
+				/>
+			</div>
+		</div>
+	);
+}
