@@ -14,6 +14,7 @@ The key architecture decision is that the external POS remains the Source of Tru
 4. Protect tenant and branch data boundaries.
 5. Improve customer ordering reliability through local mirrored reads.
 6. Keep restaurant pricing and availability trustworthy at checkout.
+7. Standardize the new persistence layer on Prisma while using raw SQL for advanced PostgreSQL capabilities.
 
 ## Success Metrics
 
@@ -43,6 +44,7 @@ Create organizational agreement on the pivot and identify all grocery-specific p
 - Identify grocery-specific flows: products, catalog items, weight ordering, replacements, availability requests.
 - Confirm retained platform capabilities: tenants, users, customers, auth, RLS, notifications, tracking.
 - Define rollout flags for restaurant menu, checkout, POS sync, and legacy flow shutdown.
+- Confirm Prisma as the ORM for the restaurant pivot, with raw SQL reserved for PostGIS, `pg_trgm`, and RLS.
 
 ### Business Value
 
@@ -69,6 +71,8 @@ Make branches and tenant configuration core platform concepts.
 - Branch-level configuration override.
 - Tenant isolation using database RLS.
 - Branch isolation enforced at service and API level.
+- Prisma-backed tenant, branch, and config data access.
+- Raw SQL migrations for RLS policies and database session context functions.
 
 ### Business Value
 
@@ -98,6 +102,7 @@ Replace grocery products with a restaurant menu model.
 - Branch-specific price overrides where needed.
 - Public menu API for customer storefront.
 - Dashboard menu visibility for restaurant staff.
+- Raw SQL support for `pg_trgm` search indexes where fuzzy menu search is needed.
 
 ### Business Value
 
@@ -266,6 +271,7 @@ Support delivery operations and customer-facing tracking.
 - ETA display.
 - Customer tracking page updates.
 - Pickup and dine-in tracking variants.
+- Raw SQL support for PostGIS delivery-zone and nearby-branch calculations.
 
 ### Business Value
 

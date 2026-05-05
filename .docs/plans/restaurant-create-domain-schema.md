@@ -10,7 +10,21 @@ Define a restaurant-first PostgreSQL schema supporting:
 - Order lifecycle and delivery tracking
 - POS external ID mapping
 
-This plan is conceptual and intended to guide migrations and entity design.
+This plan is conceptual and intended to guide Prisma schema design, Prisma migrations, and raw SQL database capabilities.
+
+## ORM and Database Capability Policy
+
+- Use Prisma as the application ORM and primary query layer.
+- Use Prisma Client for standard CRUD, relation loading, transactions, and typed domain access.
+- Do not use TypeORM for the restaurant pivot implementation.
+- Use Prisma migrations for regular tables, constraints, indexes, and application-owned schema changes where Prisma supports the feature cleanly.
+- Use raw SQL migration blocks or SQL files for PostgreSQL features Prisma does not model well enough:
+  - PostGIS extension setup and geography/geometry indexes
+  - `pg_trgm` extension setup and trigram indexes
+  - RLS functions, policies, and session settings
+  - advanced partial/expression indexes when Prisma schema cannot express them clearly
+- Use Prisma `$queryRaw` / `$executeRaw` for runtime queries requiring PostGIS or `pg_trgm` operators/functions.
+- Keep raw SQL small, named, reviewed, and isolated behind repository/service methods.
 
 ## Design Principles
 
@@ -18,6 +32,7 @@ This plan is conceptual and intended to guide migrations and entity design.
 - Branch-scoped data must include `branch_id`.
 - Use soft delete (`deleted_at`) for sync-safe lifecycle where POS replay or rollback needs it.
 - Add stable unique constraints for idempotent upsert behavior.
+- Model PostGIS fields in Prisma using `Unsupported(...)` where needed, with raw SQL for spatial operations.
 
 ## Proposed Tables
 
@@ -32,7 +47,7 @@ This plan is conceptual and intended to guide migrations and entity design.
 
 ### `branches`
 
-Use PostGIS point not lat,lng
+Use PostGIS point, not separate `lat`/`lng` columns. Prisma should model this as an unsupported database type and access spatial calculations through raw SQL.
 
 - `id` SERIAL PK
 - `tenant_id` INT NOT NULL FK
@@ -44,6 +59,11 @@ Use PostGIS point not lat,lng
 - `timezone` VARCHAR NOT NULL
 - `is_active` BOOLEAN DEFAULT true
 - `created_at`, `updated_at`, `deleted_at`
+
+Prisma note:
+
+- Use `Unsupported("geography(Point,4326)")` or the equivalent supported database type mapping available in the selected Prisma/PostGIS setup.
+- Use raw SQL for `ST_MakePoint`, `ST_DWithin`, `ST_Distance`, and GiST indexes.
 
 ``` sql
 CREATE INDEX branches_location_gix
@@ -255,6 +275,11 @@ Recommendation:
 ✅ Add GiST index
 ✅ Use ST_Contains / ST_DWithin
 
+Prisma note:
+
+- Use `Unsupported("geography(Polygon,4326)")` or equivalent for the polygon column.
+- Use raw SQL for polygon creation, `ST_Contains`, `ST_DWithin`, and GiST index creation.
+
 ### `drivers`
 
 - `id` SERIAL PK
@@ -389,6 +414,8 @@ Constraints:
 
 - Apply RLS policies to all tenant-scoped tables.
 - Policy rule: `tenant_id = app.current_tenant_id()` for `USING` and `WITH CHECK`.
+- Define RLS functions and policies through raw SQL migrations, not Prisma schema declarations.
+- Set the tenant session variable from the NestJS request context before tenant-scoped Prisma queries.
 
 ### Branch-level control
 
@@ -402,6 +429,8 @@ Constraints:
   - (`tenant_id`, `status`, `created_at`)
   - (`tenant_id`, `public_token`) for tracking
 - Keep lookup indexes for external mappings by remote and local keys.
+- Use raw SQL migrations for PostGIS GiST indexes and `pg_trgm` GIN/GiST indexes.
+- Use `pg_trgm` for search-heavy fields such as menu item name, category name, modifier name, customer name, and branch name when fuzzy search is required.
 
 ## Data Integrity Rules
 

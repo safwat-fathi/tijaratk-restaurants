@@ -10,6 +10,8 @@ Execute a safe migration from supermarket/grocery implementation to restaurant-o
 - Keep legacy endpoints operational during transition gates.
 - Cut traffic by feature flags and tenant eligibility.
 - Remove legacy flows only after verification metrics are green.
+- Build new restaurant persistence with Prisma.
+- Use raw SQL migrations for RLS, PostGIS, and `pg_trgm` capabilities that Prisma cannot represent cleanly.
 
 ## Scope of Decommission
 
@@ -46,11 +48,17 @@ Exit criteria:
 1. Add new restaurant schema and POS integration tables.
 2. Add branch model and user-branch access model.
 3. Add tenant configs for sync cadence and pricing rules.
+4. Add raw SQL setup for required PostgreSQL extensions and policies:
+   - PostGIS for branch location and delivery-zone spatial logic
+   - `pg_trgm` for fuzzy search indexes
+   - RLS functions and policies for tenant isolation
 
 Exit criteria:
 
 - Migrations applied in non-prod.
 - RLS coverage verified for all new tenant-scoped tables.
+- Prisma schema and generated client represent standard restaurant tables.
+- Raw SQL migration coverage exists for PostGIS, `pg_trgm`, and RLS.
 
 ## Phase 2: Read-Only Restaurant Menu
 

@@ -57,6 +57,12 @@ Required POS write/replay tables to request from the POS team:
 - `sync_runs`
 - `integration_events` (optional raw audit stream)
 
+Prisma implementation policy:
+
+- Model these integration tables in Prisma schema.
+- Use Prisma Client for sync state, sync runs, external mappings, and idempotent local upserts.
+- Use raw SQL only for PostgreSQL features outside Prisma's clean modeling surface, such as RLS policies, PostGIS queries, and `pg_trgm` search indexes.
+
 ## Sync Worker Model
 
 ## Worker Types
@@ -217,12 +223,19 @@ Suggested module split:
   - `sync-workers/*`
   - `order-export.service`
   - `sync-monitoring.service`
+  - `prisma-pos-mirror.repository`
 
 Suggested interfaces:
 
 - `PosAdapter` with `transformCategory`, `transformMenuItem`, `transformModifier`, `transformOrderStatus`
 - `SyncCursorStore` for reading/writing sync cursor and failure counters
 - `MirrorRepository` abstraction for idempotent upserts
+
+Prisma usage:
+
+- `MirrorRepository` should use Prisma Client transactions for local PostgreSQL writes.
+- Raw SQL should be limited to specialized database capabilities, not normal menu/order CRUD.
+- POS MySQL reads remain outside Prisma unless a separate Prisma datasource is explicitly chosen later; the default approach is a dedicated POS DB service/adapter.
 
 ## Webhook + Poll Hybrid
 

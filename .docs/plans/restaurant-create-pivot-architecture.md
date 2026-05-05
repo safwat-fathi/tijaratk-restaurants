@@ -41,6 +41,12 @@ The outcome is a restaurant-first architecture, not a supermarket extension.
    - Recalculate totals from mirrored DB at submit time.
    - Ignore client-sent price as authoritative input.
 
+6. **Prisma-first persistence**
+   - Use Prisma as the application ORM for the restaurant pivot.
+   - Use Prisma Client for standard CRUD, transactions, and typed data access.
+   - Do not implement the pivot on TypeORM.
+   - Use raw SQL only where PostgreSQL capabilities require it, specifically RLS policies/session settings, PostGIS spatial queries/indexes, and `pg_trgm` search indexes.
+
 ## Target Bounded Contexts
 
 - **Tenant Management**: tenant identity, status, plans, config
