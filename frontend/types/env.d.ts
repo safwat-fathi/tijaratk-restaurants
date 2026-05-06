@@ -1,6 +1,6 @@
-declare module "bun" {
-	
-		interface Env {
+declare global {
+	namespace NodeJS {
+		interface ProcessEnv {
 			NODE_ENV: "development" | "production";
 			NEXT_PUBLIC_API_BASE_URL: string;
 			NEXT_PUBLIC_API_GOLD_PRICE: string;
@@ -11,5 +11,5 @@ declare module "bun" {
 			SESSION_SECRET: string;
 			CSRF_SECRET: string;
 		}
-	
+	}
 }

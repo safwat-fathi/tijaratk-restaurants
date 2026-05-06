@@ -1,32 +1,44 @@
 import type { Metadata } from "next";
-import { Cairo } from "next/font/google";
+import { Tajawal, Aref_Ruqaa, Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 
-const cairo = Cairo({
+const tajawal = Tajawal({
 	subsets: ["arabic"],
-	variable: "--font-cairo",
+	variable: "--font-tajawal",
+	weight: ["300", "400", "500", "700"],
+	display: "swap",
+});
+
+const arefRuqaa = Aref_Ruqaa({
+	subsets: ["arabic"],
+	variable: "--font-aref-ruqaa",
+	weight: ["400", "700"],
+	display: "swap",
+});
+
+const notoSansArabic = Noto_Sans_Arabic({
+	subsets: ["arabic"],
+	variable: "--font-noto-sans-arabic",
 	display: "swap",
 });
 
 export const metadata: Metadata = {
 	title: {
-		default: "تجارتك | منصة إدارة المتاجر",
-		template: "%s | تجارتك",
+		default: "المخبز اللبناني | مخبز لبناني أصيل",
+		template: "%s | المخبز اللبناني",
 	},
-	description: "تجارتك هي المنصة المتكاملة لإدارة متجرك بفعالية، تتبع الطلبات، وإدارة العملاء والمنتجات بكل سهولة.",
+	description: "المخبز اللبناني هو وجهتك لتجربة المخبوزات اللبنانية الأصيلة الطازجة يومياً.",
 	keywords: [
-		"تجارتك",
-		"منصة تجارة",
-		"إدارة المتاجر",
-		"متاجر أوفلاين",
-		"تتبع الطلبات",
-		"إدارة العملاء",
-		"نظام مبيعات",
-		"تجارة إلكترونية",
+		"المخبز اللبناني",
+		"مخبوزات لبنانية",
+		"معجنات",
+		"أكل لبناني",
+		"بيروت",
+		"القاهرة",
 	],
-	authors: [{ name: "تجارتك" }],
-	creator: "تجارتك",
-	publisher: "تجارتك",
+	authors: [{ name: "المخبز اللبناني" }],
+	creator: "المخبز اللبناني",
+	publisher: "المخبز اللبناني",
 	formatDetection: {
 		email: false,
 		address: false,
@@ -35,24 +47,24 @@ export const metadata: Metadata = {
 	openGraph: {
 		type: "website",
 		locale: "ar_SA",
-		url: "https://tijaratk.com",
-		siteName: "تجارتك",
-		title: "تجارتك | منصة إدارة المتاجر",
-		description: "تجارتك هي المنصة المتكاملة لإدارة متجرك بفعالية، تتبع الطلبات، وإدارة العملاء والمنتجات بكل سهولة.",
+		url: "https://thelebanesebakery.com",
+		siteName: "المخبز اللبناني",
+		title: "المخبز اللبناني | مخبز لبناني أصيل",
+		description: "المخبز اللبناني هو وجهتك لتجربة المخبوزات اللبنانية الأصيلة الطازجة يومياً.",
 		images: [
 			{
-				url: "/logo.png",
+				url: "/main-logo.png",
 				width: 800,
 				height: 600,
-				alt: "تجارتك",
+				alt: "المخبز اللبناني",
 			},
 		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "تجارتك | منصة إدارة المتاجر",
-		description: "تجارتك هي المنصة المتكاملة لإدارة متجرك بفعالية، تتبع الطلبات، وإدارة العملاء والمنتجات بكل سهولة.",
-		images: ["/logo.png"],
+		title: "المخبز اللبناني | مخبز لبناني أصيل",
+		description: "المخبز اللبناني هو وجهتك لتجربة المخبوزات اللبنانية الأصيلة الطازجة يومياً.",
+		images: ["/main-logo.png"],
 	},
 	robots: {
 		index: true,
@@ -75,7 +87,7 @@ export default function RootLayout({
 	return (
 		<html lang="ar" dir="rtl">
 			<body
-				className={`${cairo.variable} antialiased font-sans overflow-x-hidden`}
+				className={`${tajawal.variable} ${arefRuqaa.variable} ${notoSansArabic.variable} antialiased font-sans overflow-x-hidden`}
 			>
 				{children}
 			</body>

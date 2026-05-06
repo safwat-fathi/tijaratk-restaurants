@@ -36,15 +36,15 @@ Create organizational agreement on the pivot and identify all grocery-specific p
 - Clear product decision: restaurant-only going forward.
 - Documented list of legacy grocery features to remove.
 - Agreement on what infrastructure is reused.
-- Feature flag strategy for staged rollout.
+- Hard-removal strategy for legacy grocery code.
 
 ### Feature Requirements
 
 - Define restaurant business types: fast food, fine dining, other.
 - Identify grocery-specific flows: products, catalog items, weight ordering, replacements, availability requests.
 - Confirm retained platform capabilities: tenants, users, customers, auth, RLS, notifications, tracking.
-- Define rollout flags for restaurant menu, checkout, POS sync, and legacy flow shutdown.
 - Confirm Prisma as the ORM for the restaurant pivot, with raw SQL reserved for PostGIS, `pg_trgm`, and RLS.
+- Remove legacy grocery features directly without feature flags.
 
 ### Business Value
 
@@ -375,4 +375,4 @@ Makes the platform dependable enough for production growth and larger restaurant
 3. Require branch support before restaurant checkout rollout.
 4. Require sync observability before pilot tenants.
 5. Require server-side pricing before accepting real orders.
-6. Use phased feature flags for controlled rollout.
+6. Approve hard decommission of legacy grocery code without feature flags.

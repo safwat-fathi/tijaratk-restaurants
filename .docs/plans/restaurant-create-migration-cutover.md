@@ -8,7 +8,7 @@ Execute a safe migration from supermarket/grocery implementation to restaurant-o
 
 - Use phased, additive rollout.
 - Keep legacy endpoints operational during transition gates.
-- Cut traffic by feature flags and tenant eligibility.
+- Cut traffic by direct route/module decommission and tenant communication.
 - Remove legacy flows only after verification metrics are green.
 - Build new restaurant persistence with Prisma.
 - Use raw SQL migrations for RLS, PostGIS, and `pg_trgm` capabilities that Prisma cannot represent cleanly.
@@ -33,10 +33,7 @@ Target to retain and adapt:
 
 1. Audit all API routes and UI flows that depend on grocery product model.
 2. Freeze new development in deprecated grocery modules.
-3. Introduce feature flags:
-   - `restaurant_menu_enabled`
-   - `restaurant_checkout_enabled`
-   - `pos_sync_enabled`
+3. Approve hard removal sequence for grocery-specific routes and UI.
 
 Exit criteria:
 
@@ -95,7 +92,7 @@ Exit criteria:
 
 ## Phase 5: Legacy Flow Sunset
 
-1. Disable legacy grocery routes via feature flags.
+1. Disable legacy grocery routes by direct module and route removal.
 2. Communicate and enforce API deprecation timeline.
 3. Remove obsolete code and data paths after cooldown window.
 
@@ -150,12 +147,12 @@ Exit criteria:
 - Alerts configured for lag/failures/export backlog
 - On-call ownership for integration incidents
 - Dashboards for tenant/branch sync health
-- Feature flag rollback paths tested
+- Clear rollback branch and deployment rollback procedures tested
 
 ## Rollback Strategy
 
 - Keep legacy routes dormant but deployable during initial rollout window.
-- Rollback by feature flags first, not hotfix schema rewrites.
+- Rollback by deployment/version rollback first, not hotfix schema rewrites.
 - Keep new schema additive; avoid destructive migrations before stability window ends.
 
 ## Communication Plan
