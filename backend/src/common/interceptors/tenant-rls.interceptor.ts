@@ -106,16 +106,6 @@ export class TenantRlsInterceptor implements NestInterceptor {
 
     const parts = this.getPathParts(req.path);
 
-    if (this.isProductsPublicSlugRoute(parts)) {
-      const slug = parts[2];
-      return this.resolveTenantIdBySlug(slug, queryRunner);
-    }
-
-    if (this.isAvailabilityRequestsPublicSlugRoute(parts)) {
-      const slug = parts[2];
-      return this.resolveTenantIdBySlug(slug, queryRunner);
-    }
-
     if (this.isOrdersPublicCreateRoute(req.method, parts)) {
       return this.resolveTenantIdBySlug(parts[1], queryRunner);
     }
@@ -145,12 +135,7 @@ export class TenantRlsInterceptor implements NestInterceptor {
    * Returns true for route prefixes where tenant RLS context is required.
    */
   private requiresTenantRls(path: string): boolean {
-    return (
-      path.startsWith('/products') ||
-      path.startsWith('/orders') ||
-      path.startsWith('/customers') ||
-      path.startsWith('/availability-requests')
-    );
+    return path.startsWith('/orders') || path.startsWith('/customers');
   }
 
   /**
@@ -198,26 +183,6 @@ export class TenantRlsInterceptor implements NestInterceptor {
     } catch {
       return segment;
     }
-  }
-
-  /**
-   * Returns true for /products/public/:slug routes.
-   */
-  private isProductsPublicSlugRoute(parts: string[]): boolean {
-    return (
-      parts.length >= 3 && parts[0] === 'products' && parts[1] === 'public'
-    );
-  }
-
-  /**
-   * Returns true for /availability-requests/public/:slug routes.
-   */
-  private isAvailabilityRequestsPublicSlugRoute(parts: string[]): boolean {
-    return (
-      parts.length >= 3 &&
-      parts[0] === 'availability-requests' &&
-      parts[1] === 'public'
-    );
   }
 
   /**

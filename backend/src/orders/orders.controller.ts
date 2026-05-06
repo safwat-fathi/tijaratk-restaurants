@@ -25,11 +25,8 @@ import CONSTANTS from 'src/common/constants';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { ReplaceOrderItemDto } from './dto/replace-order-item.dto';
 import { UpdateOrderItemPriceDto } from './dto/update-order-item-price.dto';
-import { DecideReplacementDto } from './dto/decide-replacement.dto';
 import { RejectOrderByCustomerDto } from './dto/reject-order-by-customer.dto';
-import { ResetOrderItemReplacementDto } from './dto/reset-order-item-replacement.dto';
 import { Request } from 'express';
 
 @ApiTags('Orders')
@@ -195,85 +192,6 @@ export class OrdersController {
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
     return this.ordersService.update(id, updateOrderDto);
-  }
-
-  @Patch('items/:id/replace')
-  @ApiBearerAuth(CONSTANTS.ACCESS_TOKEN)
-  @UseGuards(AuthGuard(CONSTANTS.AUTH.JWT))
-  @ApiOperation({
-    summary: 'Propose order item replacement',
-    description:
-      'Set or clear merchant-proposed alternative for an order item pending customer decision',
-  })
-  @ApiBody({ type: ReplaceOrderItemDto })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Order item replacement proposal updated successfully',
-  })
-  replaceOrderItem(
-    @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ReplaceOrderItemDto,
-  ) {
-    const tenantId = req.user?.tenant_id;
-    if (!tenantId) {
-      throw new UnauthorizedException('Tenant context is required');
-    }
-
-    return this.ordersService.replaceOrderItem(
-      tenantId,
-      id,
-      dto.replaced_by_product_id ?? null,
-    );
-  }
-
-  @Patch('items/:id/replacement-reset')
-  @ApiBearerAuth(CONSTANTS.ACCESS_TOKEN)
-  @UseGuards(AuthGuard(CONSTANTS.AUTH.JWT))
-  @ApiOperation({
-    summary: 'Reset order item replacement decision',
-    description:
-      'Clears replacement decision and unlocks order item for a new customer replacement proposal',
-  })
-  @ApiBody({ type: ResetOrderItemReplacementDto })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Order item replacement decision reset successfully',
-  })
-  resetOrderItemReplacement(
-    @Req() req: { user?: { tenant_id: number } },
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    const tenantId = req.user?.tenant_id;
-    if (!tenantId) {
-      throw new UnauthorizedException('Tenant context is required');
-    }
-
-    return this.ordersService.resetOrderItemReplacement(tenantId, id);
-  }
-
-  @Patch('tracking/:token/items/:itemId/replacement-decision')
-  @ApiOperation({
-    summary: 'Decide replacement item by tracking token',
-    description:
-      'Customer can approve or reject a pending replacement proposal for a specific order item',
-  })
-  @ApiBody({ type: DecideReplacementDto })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Customer replacement decision saved successfully',
-  })
-  decideReplacementByToken(
-    @Param('token') token: string,
-    @Param('itemId', ParseIntPipe) itemId: number,
-    @Body() dto: DecideReplacementDto,
-  ) {
-    return this.ordersService.decideReplacementByPublicToken(
-      token,
-      itemId,
-      dto.decision,
-      dto.reason,
-    );
   }
 
   @Patch('tracking/:token/reject')

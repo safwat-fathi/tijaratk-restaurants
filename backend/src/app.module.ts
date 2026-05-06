@@ -9,12 +9,10 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { TenantsModule } from './tenants/tenants.module';
-import { ProductsModule } from './products/products.module';
 import { CustomersModule } from './customers/customers.module';
 import { OrdersModule } from './orders/orders.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { TenantRlsInterceptor } from './common/interceptors/tenant-rls.interceptor';
-import { AvailabilityRequestsModule } from './availability-requests/availability-requests.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -39,10 +37,8 @@ const ENV = process.env.NODE_ENV;
     AuthModule,
     WhatsappModule,
     TenantsModule,
-    ProductsModule,
     CustomersModule,
     OrdersModule,
-    AvailabilityRequestsModule,
     WebhooksModule,
   ],
   controllers: [HealthController],

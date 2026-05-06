@@ -28,11 +28,18 @@ import { Product } from 'src/products/entities/product.entity';
 import { ProductStatus } from 'src/common/enums/product-status.enum';
 import { ProductPriceHistory } from 'src/products/entities/product-price-history.entity';
 import { ReplacementDecisionStatus } from 'src/common/enums/replacement-decision-status.enum';
-import { ReplacementDecisionAction } from './dto/decide-replacement.dto';
 import { DayClosure } from './entities/day-closure.entity';
 import { DbTenantContext } from 'src/common/contexts/db-tenant.context';
 import { OrderItemSelectionMode } from 'src/common/enums/order-item-selection-mode.enum';
 import { ProductOrderMode } from 'src/common/enums/product-order-mode.enum';
+
+const REPLACEMENT_DECISION_ACTION = {
+  APPROVE: 'approve',
+  REJECT: 'reject',
+} as const;
+
+type ReplacementDecisionAction =
+  (typeof REPLACEMENT_DECISION_ACTION)[keyof typeof REPLACEMENT_DECISION_ACTION];
 
 type DayCloseSummary = {
   orders_count: number;
@@ -622,13 +629,13 @@ export class OrdersService {
 
     const normalizedReason = this.normalizeOptionalReason(reason);
 
-    if (decision === ReplacementDecisionAction.APPROVE) {
+    if (decision === REPLACEMENT_DECISION_ACTION.APPROVE) {
       orderItem.replaced_by_product_id =
         orderItem.pending_replacement_product_id;
       orderItem.pending_replacement_product_id = null;
       orderItem.replacement_decision_status =
         ReplacementDecisionStatus.APPROVED;
-    } else if (decision === ReplacementDecisionAction.REJECT) {
+    } else if (decision === REPLACEMENT_DECISION_ACTION.REJECT) {
       orderItem.replaced_by_product_id = null;
       orderItem.pending_replacement_product_id = null;
       orderItem.replacement_decision_status =
@@ -1367,7 +1374,7 @@ export class OrdersService {
         return;
       }
 
-      if (decision === ReplacementDecisionAction.APPROVE) {
+      if (decision === REPLACEMENT_DECISION_ACTION.APPROVE) {
         await this.orderWhatsappService.notifyMerchantReplacementAccepted(
           order,
           item,

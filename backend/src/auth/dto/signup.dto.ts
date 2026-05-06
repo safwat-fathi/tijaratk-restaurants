@@ -39,7 +39,7 @@ export class SignupDto {
   phone: string;
 
   @ApiPropertyOptional({
-    example: 'grocery',
+    example: 'fast_food',
     description: 'Store category',
     enum: TENANT_CATEGORY_VALUES,
   })
