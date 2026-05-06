@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MvpOrderStatus {
+  pending_pos_export
+  exported_to_pos
+  pos_export_failed
+}
+
+model Branch {
+  id             Int              @id @default(autoincrement())
+  name           String
+  normalizedName String           @unique @map("normalized_name")
+  isActive       Boolean          @default(true) @map("is_active")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  deletedAt      DateTime?        @map("deleted_at")
+  deliveryServices DeliveryService[]
+  orders         MvpOrder[]
+
+  @@map("branches")
+}
+
+model MenuCategory {
+  id             Int        @id @default(autoincrement())
+  name           String
+  normalizedName String     @unique @map("normalized_name")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+  deletedAt      DateTime?  @map("deleted_at")
+  items          MenuItem[]
+
+  @@map("menu_categories")
+}
+
+model MenuItem {
+  id            Int          @id @default(autoincrement())
+  categoryId    Int?         @map("category_id")
+  category      MenuCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  posOrderCode  Int          @unique @map("pos_order_code")
+  name          String
+  price         Decimal      @db.Decimal(10, 2)
+  isActive      Boolean      @default(true) @map("is_active")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  deletedAt     DateTime?    @map("deleted_at")
+  orderItems    MvpOrderItem[]
+
+  @@index([categoryId], map: "menu_items_category_id_idx")
+  @@map("menu_items")
+}
+
+model DeliveryService {
+  id                     Int        @id @default(autoincrement())
+  branchId               Int        @map("branch_id")
+  branch                 Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  posDeliveryServiceCode Int        @map("pos_delivery_service_code")
+  name                   String
+  amount                 Decimal    @db.Decimal(10, 2)
+  isActive               Boolean    @default(true) @map("is_active")
+  createdAt              DateTime   @default(now()) @map("created_at")
+  updatedAt              DateTime   @updatedAt @map("updated_at")
+  deletedAt              DateTime?  @map("deleted_at")
+
+  @@unique([branchId, posDeliveryServiceCode], map: "delivery_services_branch_code_key")
+  @@map("delivery_services")
+}
+
+model MvpOrder {
+  id                 Int             @id @default(autoincrement())
+  branchId           Int             @map("branch_id")
+  branch             Branch          @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  customerName       String          @map("customer_name")
+  customerMobile     String          @map("customer_mobile")
+  customerAddress    String          @map("customer_address")
+  deliveryServiceCode Int            @map("delivery_service_code")
+  total              Decimal         @db.Decimal(10, 2)
+  status             MvpOrderStatus  @default(pending_pos_export)
+  posExportAttempts  Int             @default(0) @map("pos_export_attempts")
+  posLastExportError String?         @map("pos_last_export_error")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  items              MvpOrderItem[]
+
+  @@index([branchId, status], map: "mvp_orders_branch_status_idx")
+  @@map("mvp_orders")
+}
+
+model MvpOrderItem {
+  id          Int      @id @default(autoincrement())
+  orderId     Int      @map("order_id")
+  order       MvpOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId  Int      @map("menu_item_id")
+  menuItem    MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+  posOrderCode Int     @map("pos_order_code")
+  nameSnapshot String  @map("name_snapshot")
+  unitPrice   Decimal  @db.Decimal(10, 2) @map("unit_price")
+  totalPrice  Decimal  @db.Decimal(10, 2) @map("total_price")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("mvp_order_items")
+}
+
+model SyncState {
+  id                    Int       @id @default(autoincrement())
+  entityType            String    @map("entity_type")
+  lastSyncedAt          DateTime? @map("last_synced_at")
+  consecutiveFailures   Int       @default(0) @map("consecutive_failures")
+  lastError             String?   @map("last_error")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@unique([entityType], map: "sync_state_entity_type_key")
+  @@map("sync_state")
+}
+
+model SyncRun {
+  id            Int       @id @default(autoincrement())
+  entityType    String    @map("entity_type")
+  status        String
+  rowsRead      Int       @default(0) @map("rows_read")
+  rowsUpserted  Int       @default(0) @map("rows_upserted")
+  errorMessage  String?   @map("error_message")
+  startedAt     DateTime  @default(now()) @map("started_at")
+  finishedAt    DateTime? @map("finished_at")
+
+  @@map("sync_runs")
+}
