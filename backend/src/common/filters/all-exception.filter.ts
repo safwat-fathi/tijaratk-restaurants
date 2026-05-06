@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { Request, Response } from 'express';
-import { QueryFailedError } from 'typeorm';
+import { Prisma } from '@prisma/client';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
@@ -99,7 +99,11 @@ export class AllExceptionFilter implements ExceptionFilter {
       message = details.message;
       errorDetails = details.errorDetails;
     } else if (
-      exception instanceof QueryFailedError ||
+      exception instanceof Prisma.PrismaClientKnownRequestError ||
+      exception instanceof Prisma.PrismaClientUnknownRequestError ||
+      exception instanceof Prisma.PrismaClientRustPanicError ||
+      exception instanceof Prisma.PrismaClientInitializationError ||
+      exception instanceof Prisma.PrismaClientValidationError ||
       (typeof exception === 'object' && exception !== null && 'code' in exception)
     ) {
       const details = this.handleDbException(exception);
@@ -134,19 +138,34 @@ export class AllExceptionFilter implements ExceptionFilter {
   private handleDbException(exception: unknown) {
     let status: number = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Database operation failed';
-    const code = (exception as Record<string, unknown>).code;
 
-    if (code === '22P02') {
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      if (exception.code === 'P2002') {
+        status = HttpStatus.CONFLICT;
+        message = 'Duplicate entry violation';
+      } else if (exception.code === 'P2003') {
+        status = HttpStatus.BAD_REQUEST;
+        message = 'Foreign key constraint violation';
+      } else if (exception.code === 'P2025') {
+        status = HttpStatus.NOT_FOUND;
+        message = 'Record not found';
+      } else {
+        const errMsg = exception.message;
+        const errStack = exception.stack;
+        this.logger.error(
+          `Database Error [${exception.code}]: ${errMsg}`,
+          errStack,
+        );
+      }
+    } else if (exception instanceof Prisma.PrismaClientValidationError) {
       status = HttpStatus.BAD_REQUEST;
       message = 'Invalid input syntax for database query';
-    } else if (code === '23505') {
-      status = HttpStatus.CONFLICT;
-      message = 'Duplicate entry violation';
     } else {
+      const code = (exception as Record<string, unknown>).code;
       const errMsg = exception instanceof Error ? exception.message : 'Unknown';
       const errStack = exception instanceof Error ? exception.stack : undefined;
       this.logger.error(
-        `Database Error [${String(code)}]: ${errMsg}`,
+        `Database Error [${String(code || 'Unknown')}]: ${errMsg}`,
         errStack,
       );
     }

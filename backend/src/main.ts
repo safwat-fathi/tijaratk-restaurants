@@ -9,15 +9,14 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ResponseTransformInterceptor } from './common/interceptors/response-transform.transform';
-import { TypeOrmExceptionFilter } from './common/filters/db-exception.filter';
-import { TenantRlsInterceptor } from './common/interceptors/tenant-rls.interceptor';
+import { PrismaExceptionFilter } from './common/filters/db-exception.filter';
 import { validationExceptionFactory } from './common/utils/validation-exception.factory';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Register Global TypeORM Exception Filter
-  app.useGlobalFilters(new TypeOrmExceptionFilter());
+  // Register Global Database Exception Filter
+  app.useGlobalFilters(new PrismaExceptionFilter());
 
   // Remove COOP header to fix Swagger UI issues
   app.use((_req: Request, res: Response, next: NextFunction) => {
@@ -71,11 +70,15 @@ async function bootstrap() {
 
   // Swagger docs
   const options = new DocumentBuilder()
-    .setTitle('Tijaratk API')
-    .setDescription('Tijaratk API documentation')
+    .setTitle('Tijaratk Restaurant API')
+    .setDescription('Tijaratk Restaurant API documentation')
     .setVersion('1.0')
     .setExternalDoc('API Documentation', '/docs')
-    .setContact('Tijaratk', 'https://www.tijaratk.com', 'help@tijaratk.com')
+    .setContact(
+      'Tijaratk Restaurant',
+      'https://www.tijaratk.com',
+      'help@tijaratk.com',
+    )
     .addBearerAuth(
       {
         type: 'http',
@@ -124,11 +127,7 @@ async function bootstrap() {
   );
 
   // Global Interceptor for success responses
-  const tenantRlsInterceptor = app.get(TenantRlsInterceptor);
-  const interceptors: NestInterceptor[] = [
-    tenantRlsInterceptor,
-    new ResponseTransformInterceptor(),
-  ];
+  const interceptors: NestInterceptor[] = [new ResponseTransformInterceptor()];
   app.useGlobalInterceptors(...interceptors);
 
   await app.listen(process.env.HTTP_SERVER_PORT, '127.0.0.1');

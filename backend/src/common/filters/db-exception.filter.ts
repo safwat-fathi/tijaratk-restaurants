@@ -5,32 +5,40 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { Response } from 'express';
-import { QueryFailedError, TypeORMError } from 'typeorm';
+import { Response, Request } from 'express';
+import { Prisma } from '@prisma/client';
 
-@Catch(TypeORMError)
-export class TypeOrmExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(TypeOrmExceptionFilter.name);
+@Catch(
+  Prisma.PrismaClientKnownRequestError,
+  Prisma.PrismaClientUnknownRequestError,
+  Prisma.PrismaClientRustPanicError,
+  Prisma.PrismaClientInitializationError,
+  Prisma.PrismaClientValidationError,
+)
+export class PrismaExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(PrismaExceptionFilter.name);
 
-  catch(exception: TypeORMError, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Database operation failed';
-    const code = (exception as TypeORMError & { code?: string }).code;
 
-    if (exception instanceof QueryFailedError) {
-      const result = this.handleQueryFailedError(exception, code as string);
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      const result = this.handleKnownRequestError(exception);
       status = result.status;
       message = result.message;
+    } else if (exception instanceof Prisma.PrismaClientValidationError) {
+      status = HttpStatus.BAD_REQUEST;
+      message = 'Database validation error';
     }
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(
-        `Database Error [${code}]: ${exception.message}`,
-        exception.stack,
+        `Database Error: ${exception instanceof Error ? exception.message : 'Unknown'}`,
+        exception instanceof Error ? exception.stack : undefined,
       );
     }
 
@@ -42,29 +50,31 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
     });
   }
 
-  private handleQueryFailedError(
-    exception: QueryFailedError,
-    code?: string,
+  private handleKnownRequestError(
+    exception: Prisma.PrismaClientKnownRequestError,
   ): { status: number; message: string } {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Database operation failed';
 
-    if (code === '23505') {
-      status = HttpStatus.CONFLICT;
-      const detail = (exception as QueryFailedError & { detail?: string })
-        .detail;
-      if (detail) {
-        const match = /Key \((.*?)\)=\(.*?\)/.exec(detail);
-        message = match && match[1] ? `${match[1]} already exists` : detail;
-      } else {
-        message = 'Duplicate entry';
+    switch (exception.code) {
+      case 'P2002': {
+        status = HttpStatus.CONFLICT;
+        const target = exception.meta?.target;
+        message = target ? `Duplicate entry for ${String(target)}` : 'Duplicate entry';
+        break;
       }
-    } else if (code === '23503') {
-      status = HttpStatus.BAD_REQUEST;
-      message = 'Foreign key constraint violation';
-    } else if (code === '22P02') {
-      status = HttpStatus.BAD_REQUEST;
-      message = 'Invalid input syntax for database query';
+      case 'P2003': {
+        status = HttpStatus.BAD_REQUEST;
+        message = 'Foreign key constraint violation';
+        break;
+      }
+      case 'P2025': {
+        status = HttpStatus.NOT_FOUND;
+        message = 'Record not found';
+        break;
+      }
+      default:
+        break;
     }
 
     return { status, message };
