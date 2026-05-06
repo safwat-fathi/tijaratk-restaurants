@@ -40,7 +40,7 @@ Create organizational agreement on the pivot and identify all grocery-specific p
 
 ### Feature Requirements
 
-- Define restaurant business types: fast food, fine dining, cloud kitchen, other.
+- Define restaurant business types: fast food, fine dining, other.
 - Identify grocery-specific flows: products, catalog items, weight ordering, replacements, availability requests.
 - Confirm retained platform capabilities: tenants, users, customers, auth, RLS, notifications, tracking.
 - Define rollout flags for restaurant menu, checkout, POS sync, and legacy flow shutdown.
