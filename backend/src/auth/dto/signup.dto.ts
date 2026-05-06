@@ -8,20 +8,8 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Match } from 'src/common/decorators/match.decorator';
 import { IsPhoneNumber } from 'src/common/validators/is-phone-number.validator';
-import {
-  TENANT_CATEGORY_VALUES,
-  TenantCategory,
-} from 'src/tenants/constants/tenant-category';
 
 export class SignupDto {
-  @ApiProperty({
-    example: 'My Awesome Store',
-    description: 'The name of the store',
-  })
-  @IsNotEmpty()
-  @IsString()
-  storeName: string;
-
   @ApiProperty({
     example: 'Ahmed Mohamed',
     description: 'The name of the owner',
@@ -37,16 +25,6 @@ export class SignupDto {
   @IsNotEmpty()
   @IsPhoneNumber({ allowedCountries: ['EG'] })
   phone: string;
-
-  @ApiPropertyOptional({
-    example: 'fast_food',
-    description: 'Store category',
-    enum: TENANT_CATEGORY_VALUES,
-  })
-  @IsOptional()
-  @IsString()
-  @IsIn(TENANT_CATEGORY_VALUES)
-  category?: TenantCategory;
 
   @ApiProperty({
     example: 'password123',

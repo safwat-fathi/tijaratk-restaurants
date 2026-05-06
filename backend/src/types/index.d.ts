@@ -3,7 +3,7 @@ declare global {
     interface User {
       id: string;
       email?: string;
-      facebookId: string;
+      phone: string;
       first_name?: string;
       last_name?: string;
       tenant_id?: number;

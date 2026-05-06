@@ -8,6 +8,14 @@ declare global {
       DB_PASS: string;
       DB_HOST: string;
       DB_PORT: number;
+      DATABASE_URL: string;
+      POS_DB_HOST: string;
+      POS_DB_PORT: number;
+      POS_DB_USER: string;
+      POS_DB_PASS: string;
+      POS_DB_NAME: string;
+      POS_DB_ENCRYPT?: string;
+      POS_DB_TRUST_CERT?: string;
       APP_URL: string;
       JWT_SECRET: string;
       CSRF_SECRET: string;

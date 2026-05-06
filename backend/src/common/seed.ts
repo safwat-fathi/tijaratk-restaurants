@@ -1,11 +1,11 @@
 import { Logger } from '@nestjs/common';
-import dataSource from 'src/config/orm.config';
+
 
 async function bootstrap() {
   const logger = new Logger('Seed');
   logger.log('Seeding...');
 
-  await dataSource.initialize();
+  // await dataSource.initialize();
 
   try {
     logger.log('Legacy grocery catalog seeding has been removed.');
@@ -13,7 +13,7 @@ async function bootstrap() {
   } catch (error) {
     logger.error('Seeding error:', error);
   } finally {
-    await dataSource.destroy();
+    // await dataSource.destroy();
   }
 }
 
