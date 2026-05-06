@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Package, Globe } from "lucide-react"; // lucide-react is commonly used; assuming it's available or easily swappable
 
 export default function StorefrontNavbar() {
   return (

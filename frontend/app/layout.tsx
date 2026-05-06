@@ -85,9 +85,9 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="ar" dir="rtl">
+		<html lang="ar" dir="rtl" className="scroll-smooth">
 			<body
-				className={`${tajawal.variable} ${arefRuqaa.variable} ${notoSansArabic.variable} antialiased font-sans overflow-x-hidden`}
+				className={`${tajawal.variable} ${arefRuqaa.variable} ${notoSansArabic.variable} antialiased font-sans`}
 			>
 				{children}
 			</body>

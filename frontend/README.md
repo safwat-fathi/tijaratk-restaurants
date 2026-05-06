@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tijaratk Restaurant Frontend
+
+This is the customer-facing and merchant dashboard frontend for the Tijaratk Restaurant platform, built with **Next.js**.
+
+## Product Goal
+
+The platform delivers a fast, "order-now" restaurant experience. It prioritizes speed, clarity, and trust in pricing and availability, focused on active order fulfillment rather than long-term customer history.
+
+## Architecture & Integration
+
+-   **POS-Driven Menu:** The menu is always read from our local PostgreSQL mirror of POS data, ensuring high performance even during high traffic.
+-   **Pricing Integrity:** All totals and availability are validated server-side at checkout against mirrored POS data.
+-   **Branch-Centric UX:** The experience is strictly scoped to the selected branch, including operating hours and delivery service fees.
+-   **Real-time Tracking:** Order status updates are synced from the POS `change_log` to provide live tracking for active orders.
+
+## Customer Experience Flow
+
+1.  **Storefront Entry:** Restaurant identity and "Start Order" CTA.
+2.  **Branch Selection:** Choose the fulfilling location.
+3.  **Menu Browsing:** Browse categories and items (synced from POS view `PS_ApplicationOrders_V`).
+4.  **Cart & Customization:** Configure item quantities and review order breakdown.
+5.  **Checkout:** Choose fulfillment (Delivery/Pickup) and provide contact details. Delivery fees are derived from POS view `PS_ApplicationDeliveryServices_V`.
+6.  **Tracking:** Monitor the live order status as it moves through the POS lifecycle.
+
+## Tech Stack
+
+-   **Framework:** Next.js (App Router)
+-   **Styling:** Tailwind CSS
+-   **Icons:** Lucide React
+-   **Validation:** Zod / React Hook Form
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+$ pnpm install
+```
+
+Then, run the development server:
+
+```bash
+$ pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Ensure the `NEXT_PUBLIC_API_BASE_URL` in your `.env` points to the running backend instance.
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The application is optimized for deployment on the **Vercel Platform**.

@@ -111,7 +111,6 @@
     @apply border-border;
   }
   html, body {
-    overflow-x: hidden !important;
     width: 100%;
     margin: 0;
     padding: 0;
