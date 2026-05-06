@@ -11,32 +11,6 @@ export async function clearTrackedOrdersAction() {
   revalidatePath('/track-orders');
 }
 
-export async function decideReplacementByTrackingAction(
-  token: string,
-  itemId: number,
-  payload: { decision: 'approve' | 'reject'; reason?: string },
-) {
-  try {
-    const response = await ordersService.decideReplacementByToken(
-      token,
-      itemId,
-      payload,
-    );
-
-    revalidatePath(`/track-order/${token}`);
-    revalidatePath('/track-orders');
-
-    return { success: true, data: response.data };
-  } catch (error) {
-    if (isNextRedirectError(error)) {
-      throw error;
-    }
-
-    console.error('Failed to submit replacement decision:', error);
-    return { success: false, error: 'Failed to submit replacement decision' };
-  }
-}
-
 export async function rejectOrderByTrackingAction(
   token: string,
   payload: { reason?: string },

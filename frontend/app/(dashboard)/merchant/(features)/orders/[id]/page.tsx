@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { ordersService } from "@/services/api/orders.service";
-import { productsService } from "@/services/api/products.service";
 import { OrderStatus } from "@/types/enums";
-import OrderItemsReplacement from "./_components/OrderItemsReplacement";
 import { isNextRedirectError } from "@/lib/auth/navigation-errors";
 import { formatCurrency } from "@/lib/utils/currency";
 
@@ -37,10 +35,7 @@ export default async function OrderDetailsPage({
 }) {
 	const { id } = await params;
 
-	const [orderResponse, productsResponse] = await Promise.all([
-		ordersService.getOrder(Number(id)),
-		productsService.getProducts(),
-	]);
+	const orderResponse = await ordersService.getOrder(Number(id));
 
 	if (!orderResponse.success || !orderResponse.data) {
 		return (
@@ -52,10 +47,6 @@ export default async function OrderDetailsPage({
 
 	const order = orderResponse.data;
 	const customer = order.customer || {};
-	const products =
-		productsResponse.success && productsResponse.data
-			? productsResponse.data
-			: [];
 
 	async function updateStatus(newStatus: OrderStatus) {
 		"use server";
@@ -142,12 +133,11 @@ export default async function OrderDetailsPage({
 					)}
 				</section>
 
-				<OrderItemsReplacement
-					orderId={order.id}
-					orderStatus={order.status}
-					initialItems={order.items || []}
-					products={products}
-				/>
+				<section className="rounded-xl border border-orange-100 bg-orange-50 p-4 shadow-sm">
+					<p className="text-sm text-orange-900">
+						تم إزالة تدفق الاستبدال القديم الخاص بالبقالة من النظام.
+					</p>
+				</section>
 
 				{order.free_text_payload?.text && (
 					<section className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">

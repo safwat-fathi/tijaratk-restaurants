@@ -1,36 +1,18 @@
-import SafeImage from "@/components/ui/SafeImage";
+import StorefrontNavbar from "@/components/shared/StorefrontNavbar";
+import StorefrontFooter from "@/components/shared/StorefrontFooter";
 
-export default function PublicLayout({
+export default function StorefrontLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-		<>
-			<div className="min-h-screen bg-gray-50 flex flex-col items-center px-4 sm:px-6 lg:px-8 pb-8">
-				<div className="w-full max-w-3xl space-y-8">{children}</div>
-			</div>
-			<footer className="w-full border-t border-gray-200 bg-white flex items-center justify-center">
-				<div className="flex items-center justify mx-auto max-w-7xl px-4 py-6 sm:px-6 gap-2 lg:px-8">
-					<SafeImage
-						src="/logo.png"
-						alt="Tijaratk"
-						width={32}
-						height={32}
-						fallback={<div className="h-8 w-8 rounded bg-gray-100" />}
-					/>
-					<div className="flex justify-center md:order-2">
-						<a href="#" className="text-gray-400 hover:text-gray-500">
-							<span className="sr-only">فيسبوك</span>
-							{/* SVG Icon */}
-						</a>
-					</div>
-
-					<p className="text-center text-xs leading-5 text-gray-500">
-						&copy; {new Date().getFullYear()} تجارتك. جميع الحقوق محفوظة.
-					</p>
-				</div>
-			</footer>
-		</>
-	);
+    <div className="min-h-screen bg-[#fff8f5] flex flex-col font-tajawal text-[#1e1b18] overflow-x-hidden">
+      <StorefrontNavbar />
+      <main className="grow w-full overflow-x-hidden">
+        {children}
+      </main>
+      <StorefrontFooter />
+    </div>
+  );
 }

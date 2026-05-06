@@ -2,14 +2,11 @@ import { getCookieAction } from "@/app/actions/cookie-store";
 import { STORAGE_KEYS } from "@/constants";
 import { ordersService } from "@/services/api/orders.service";
 import { tenantsService } from "@/services/api/tenants.service";
-import { availabilityRequestsService } from "@/services/api/availability-requests.service";
 import { OrderStatus } from "@/types/enums";
 import { DayCloseTodayStatusResponse } from "@/types/services/orders";
-import { MerchantAvailabilitySummaryResponse } from "@/types/services/availability-requests";
 import TodaySnapshot from "./_components/TodaySnapshot";
 import EndOfDayTeaser from "./_components/EndOfDayTeaser";
 import StorefrontLinkCard from "./_components/StorefrontLinkCard";
-import AvailabilityRequestsCard from "./_components/AvailabilityRequestsCard";
 import { DashboardStats } from "./_components/dashboard.types";
 
 export const metadata = {
@@ -32,12 +29,11 @@ export default async function Dashboard() {
 	const user = userCookie ? JSON.parse(userCookie) : null;
 	const name = user?.name || "تاجر";
 
-	const [ordersResponse, tenantResponse, dayCloseStatusResponse, availabilityResponse] =
+	const [ordersResponse, tenantResponse, dayCloseStatusResponse] =
 		await Promise.all([
 			ordersService.getOrders(),
 			tenantsService.getMyTenant(),
 			ordersService.getTodayDayCloseStatus(),
-			availabilityRequestsService.getMerchantSummary({ days: 1, limit: 5 }),
 		]);
 
 	const allOrders =
@@ -83,16 +79,6 @@ export default async function Dashboard() {
 			? dayCloseStatusResponse.data
 			: dayCloseStatusFallback;
 
-	const availabilitySummaryFallback: MerchantAvailabilitySummaryResponse = {
-		today_total_requests: 0,
-		top_products: [],
-	};
-
-	const availabilitySummary =
-		availabilityResponse.success && availabilityResponse.data
-			? availabilityResponse.data
-			: availabilitySummaryFallback;
-
 	return (
 		<div className="flex flex-col gap-6 pb-20">
 			{/* Header / Welcome - Minimal */}
@@ -105,7 +91,6 @@ export default async function Dashboard() {
 
 			{/* 1. Today Snapshot */}
 			<TodaySnapshot stats={stats} />
-			<AvailabilityRequestsCard summary={availabilitySummary} />
 
 			{/* 2. Action Center */}
 			{/* <ActionCenter items={actionItems} /> */}

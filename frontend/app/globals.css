@@ -7,6 +7,10 @@
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
+  --font-aref-ruqaa: var(--font-aref-ruqaa), serif;
+  --font-tajawal: var(--font-tajawal), sans-serif;
+  --font-noto-sans-arabic: var(--font-noto-sans-arabic), sans-serif;
+
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
 
@@ -107,7 +111,11 @@
     @apply border-border;
   }
   html, body {
-    @apply overflow-x-hidden;
+    overflow-x: hidden !important;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
   body {
     @apply bg-background text-foreground;

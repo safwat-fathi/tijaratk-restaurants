@@ -28,63 +28,6 @@ export async function updateOrderStatus(orderId: number, status: OrderStatus) {
   }
 }
 
-export async function replaceOrderItemAction(
-  orderId: number,
-  itemId: number,
-  replacedByProductId: number | null,
-) {
-  try {
-    const response = await ordersService.replaceOrderItem(itemId, {
-      replaced_by_product_id: replacedByProductId,
-    });
-
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.message || 'Failed to replace order item',
-      };
-    }
-
-    revalidatePath(`/merchant/orders/${orderId}`);
-    revalidatePath('/merchant/orders');
-
-    return { success: true, data: response.data };
-  } catch (error) {
-    if (isNextRedirectError(error)) {
-      throw error;
-    }
-    console.error('Failed to replace order item:', error);
-    return { success: false, error: 'Failed to replace order item' };
-  }
-}
-
-export async function resetOrderItemReplacementAction(
-  orderId: number,
-  itemId: number,
-) {
-  try {
-    const response = await ordersService.resetOrderItemReplacement(itemId);
-
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.message || 'Failed to reset order item replacement',
-      };
-    }
-
-    revalidatePath(`/merchant/orders/${orderId}`);
-    revalidatePath('/merchant/orders');
-
-    return { success: true, data: response.data };
-  } catch (error) {
-    if (isNextRedirectError(error)) {
-      throw error;
-    }
-    console.error('Failed to reset order item replacement:', error);
-    return { success: false, error: 'Failed to reset order item replacement' };
-  }
-}
-
 export async function updateOrderItemPriceAction(
   orderId: number,
   itemId: number,

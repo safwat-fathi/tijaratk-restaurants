@@ -1,48 +1,24 @@
 export const TENANT_CATEGORY_VALUES = [
-  "grocery",
-  "greengrocer",
-  "butcher",
-  "bakery",
-  "pharmacy",
+  "fast_food",
+  "fine_dining",
   "other",
 ] as const;
 
 export type TenantCategory = (typeof TENANT_CATEGORY_VALUES)[number];
 
 export const TENANT_CATEGORIES = {
-  GROCERY: {
-    value: "grocery",
+  FAST_FOOD: {
+    value: "fast_food",
     labels: {
-      en: "Grocery",
-      ar: "بقالة",
+      en: "Fast Food",
+      ar: "وجبات سريعة",
     },
   },
-  GREENGROCER: {
-    value: "greengrocer",
+  FINE_DINING: {
+    value: "fine_dining",
     labels: {
-      en: "Greengrocer",
-      ar: "خضروات وفواكه",
-    },
-  },
-  BUTCHER: {
-    value: "butcher",
-    labels: {
-      en: "Butcher",
-      ar: "جزارة",
-    },
-  },
-  BAKERY: {
-    value: "bakery",
-    labels: {
-      en: "Bakery",
-      ar: "مخبز",
-    },
-  },
-  PHARMACY: {
-    value: "pharmacy",
-    labels: {
-      en: "Pharmacy",
-      ar: "صيدلية",
+      en: "Fine Dining",
+      ar: "مطعم فاخر",
     },
   },
   OTHER: {

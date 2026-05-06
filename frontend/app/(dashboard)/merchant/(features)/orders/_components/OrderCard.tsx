@@ -87,8 +87,7 @@ export default function OrderCard({ order, isHighlighted }: OrderCardProps) {
     if (order.items && order.items.length > 0) {
       return order.items
         .map((item) => {
-          const itemName = item.replaced_by_product?.name || item.name_snapshot;
-          return formatRtlQuantityLabel(itemName, item.quantity);
+          return formatRtlQuantityLabel(item.name_snapshot, item.quantity);
         })
         .join(", ");
     }

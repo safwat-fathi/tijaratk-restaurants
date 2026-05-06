@@ -46,25 +46,6 @@ const navigation = [
 		),
 	},
 	{
-		name: "المنتجات",
-		href: "/merchant/products/new",
-		icon: (
-			<svg
-				className="me-3 h-6 w-6 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				strokeWidth="1.5"
-				stroke="currentColor"
-			>
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					d="M6 6.75 12 3l6 3.75M6 6.75v10.5L12 21m-6-14.25L12 10.5m0 10.5 6-3.75V6.75m-6 3.75 6-3.75"
-				/>
-			</svg>
-		),
-	},
-	{
 		name: "العملاء",
 		href: "/merchant/customers",
 		icon: (
