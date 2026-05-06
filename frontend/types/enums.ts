@@ -7,13 +7,6 @@ export enum OrderStatus {
   REJECTED_BY_CUSTOMER = 'rejected_by_customer',
 }
 
-export enum ReplacementDecisionStatus {
-  NONE = 'none',
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-}
-
 export enum OrderType {
   CATALOG = 'catalog',
   FREE_TEXT = 'free_text',

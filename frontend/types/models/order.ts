@@ -1,9 +1,4 @@
-import {
-  OrderStatus,
-  OrderType,
-  PricingMode,
-  ReplacementDecisionStatus,
-} from '../enums';
+import { OrderStatus, OrderType, PricingMode } from '../enums';
 
 export interface OrderCustomer {
   name?: string;
@@ -29,21 +24,6 @@ export interface OrderItem {
   selection_grams?: number | null;
   selection_amount_egp?: OrderNumericValue;
   unit_option_id?: string | null;
-  replaced_by_product_id?: number | null;
-  replaced_by_product?: {
-    id: number;
-    name: string;
-    image_url?: string | null;
-  } | null;
-  pending_replacement_product_id?: number | null;
-  pending_replacement_product?: {
-    id: number;
-    name: string;
-    image_url?: string | null;
-  } | null;
-  replacement_decision_status?: ReplacementDecisionStatus;
-  replacement_decision_reason?: string | null;
-  replacement_decided_at?: string | null;
 }
 
 export interface Order {
