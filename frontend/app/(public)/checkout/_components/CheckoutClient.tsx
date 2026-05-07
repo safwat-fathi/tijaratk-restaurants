@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import { clearCartAction } from "@/actions/cart-actions";
 import { MenuItem } from "@/types/models/menu";
 import { DeliveryService } from "@/types/models/delivery-service";
 
@@ -14,17 +15,18 @@ type CartItem = {
 
 type CheckoutClientProps = {
   branchId: string;
-  deliveryServices: DeliveryService[];
+  deliveryServiceCode: string;
+  selectedDeliveryService: DeliveryService;
+  initialCartItems: CartItem[];
 };
 
 export default function CheckoutClient({
   branchId,
-  deliveryServices,
+  deliveryServiceCode,
+  selectedDeliveryService,
+  initialCartItems,
 }: CheckoutClientProps) {
   const router = useRouter();
-  const [cart, setCart] = useState<Record<number, CartItem>>({});
-  const [isMounted, setIsMounted] = useState(false);
-  
   const [formData, setFormData] = useState({
     customerName: "",
     customerMobile: "",
@@ -34,36 +36,18 @@ export default function CheckoutClient({
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setIsMounted(true);
-    const savedCart = localStorage.getItem(`tijaratk_cart_${branchId}`);
-    if (savedCart) {
-      try {
-        const parsed = JSON.parse(savedCart);
-        if (Object.keys(parsed).length === 0) {
-          router.replace(`/menu?branchId=${branchId}`);
-        } else {
-          setCart(parsed);
-        }
-      } catch {
-        localStorage.removeItem(`tijaratk_cart_${branchId}`);
-        router.replace(`/menu?branchId=${branchId}`);
-      }
-    } else {
-      router.replace(`/menu?branchId=${branchId}`);
-    }
-  }, [branchId, router]);
-
-  const cartItems = Object.values(cart);
-  const selectedDeliveryService = deliveryServices[0];
+  const cartItems = initialCartItems;
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + Number(item.menuItem.price) * item.quantity,
     0
   );
 
+  const deliveryFee = Number(selectedDeliveryService.amount) || 0;
+  const finalTotal = totalPrice + deliveryFee;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (cartItems.length === 0 || !selectedDeliveryService) return;
+    if (cartItems.length === 0) return;
 
     setIsSubmitting(true);
     setError(null);
@@ -84,7 +68,7 @@ export default function CheckoutClient({
           customerAddress: formData.customerAddress,
           deliveryServiceCode: selectedDeliveryService.posDeliveryServiceCode,
           menuItemId: primaryItem.id,
-          total: totalPrice, // Send total cart price
+          total: finalTotal, // Send total order price including delivery
         }),
       });
 
@@ -94,7 +78,7 @@ export default function CheckoutClient({
       }
 
       // Success
-      localStorage.removeItem(`tijaratk_cart_${branchId}`);
+      await clearCartAction();
       setIsSuccess(true);
       
       // Redirect after 3 seconds
@@ -108,14 +92,6 @@ export default function CheckoutClient({
       setIsSubmitting(false);
     }
   };
-
-  if (!isMounted || cartItems.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fff8f5]">
-        <Loader2 className="w-8 h-8 text-[#812f1d] animate-spin" />
-      </div>
-    );
-  }
 
   if (isSuccess) {
     return (
@@ -134,7 +110,10 @@ export default function CheckoutClient({
       {/* Header */}
       <header className="sticky top-0 z-40 w-full bg-[#fff8f5]/90 backdrop-blur-md border-b border-[#e9e1dc]">
         <div className="flex items-center justify-between px-4 h-16 max-w-2xl mx-auto w-full">
-          <Link href={`/menu?branchId=${branchId}`} className="p-2 -mr-2 rounded-full hover:bg-[#f5ece7] text-[#1e1b18] transition-colors">
+          <Link
+            href={`/menu?branchId=${branchId}&deliveryServiceCode=${deliveryServiceCode}`}
+            className="p-2 -mr-2 rounded-full hover:bg-[#f5ece7] text-[#1e1b18] transition-colors"
+          >
             <ArrowRight className="w-6 h-6" />
             <span className="sr-only">عودة للقائمة</span>
           </Link>
@@ -150,18 +129,29 @@ export default function CheckoutClient({
           <div className="space-y-3 mb-4">
             {cartItems.map((item) => (
               <div key={item.menuItem.id} className="flex justify-between text-sm font-tajawal">
-                <span className="text-[#1e1b18]">{item.quantity}x {item.menuItem.name}</span>
+                <div className="flex items-center gap-2 text-[#1e1b18]">
+                  <span>{item.menuItem.name}</span>
+                  <span className="text-[#812f1d] font-bold" dir="ltr">{item.quantity}x</span>
+                </div>
                 <span className="font-noto-sans-arabic font-bold text-[#55423e]">{(Number(item.menuItem.price) * item.quantity).toFixed(2)} ج.م.</span>
               </div>
             ))}
           </div>
-          <div className="flex justify-between items-center pt-4 border-t border-[#f5ece7]">
-            <span className="font-tajawal font-bold text-lg text-[#1e1b18]">الإجمالي</span>
-            <span className="font-noto-sans-arabic font-bold text-xl text-[#812f1d]">{totalPrice.toFixed(2)} ج.م.</span>
+          <div className="flex justify-between items-center pt-4 border-t border-[#f5ece7] text-sm font-tajawal text-[#55423e]">
+            <span>المجموع</span>
+            <span className="font-noto-sans-arabic font-bold">{totalPrice.toFixed(2)} ج.م.</span>
           </div>
-          <div className="flex justify-between items-center pt-3 text-sm font-tajawal text-[#55423e]">
-            <span>طريقة التوصيل</span>
-            <span>{selectedDeliveryService?.name || "غير متاحة"}</span>
+          <div className="flex justify-between items-center pt-2 text-sm font-tajawal text-[#55423e]">
+            <span>منطقة التوصيل</span>
+            <span>{selectedDeliveryService.name}</span>
+          </div>
+          <div className="flex justify-between items-center pt-2 pb-4 text-sm font-tajawal text-[#55423e] border-b border-[#f5ece7]">
+            <span>رسوم التوصيل</span>
+            <span className="font-noto-sans-arabic font-bold">{deliveryFee.toFixed(2)} ج.م.</span>
+          </div>
+          <div className="flex justify-between items-center pt-4">
+            <span className="font-tajawal font-bold text-lg text-[#1e1b18]">الإجمالي النهائي</span>
+            <span className="font-noto-sans-arabic font-bold text-xl text-[#812f1d]">{finalTotal.toFixed(2)} ج.م.</span>
           </div>
         </section>
 
@@ -173,12 +163,6 @@ export default function CheckoutClient({
             {error && (
               <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-tajawal">
                 {error}
-              </div>
-            )}
-
-            {!selectedDeliveryService && (
-              <div className="p-3 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-sm font-tajawal">
-                لا توجد خدمة توصيل متاحة لهذا الفرع حالياً.
               </div>
             )}
 
@@ -224,7 +208,7 @@ export default function CheckoutClient({
 
             <button 
               type="submit" 
-              disabled={isSubmitting || !selectedDeliveryService}
+              disabled={isSubmitting}
               className="w-full mt-8 bg-[#812f1d] hover:bg-[#a04632] disabled:bg-[#dcc1bb] disabled:cursor-not-allowed text-white py-4 rounded-[4px] font-aref-ruqaa text-2xl shadow-md transition-colors flex items-center justify-center gap-2"
             >
               {isSubmitting ? (

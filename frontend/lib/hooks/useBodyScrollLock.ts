@@ -1,28 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
+
+// Use layout effect if possible
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 type BodyStyleSnapshot = {
-	position: string;
-	top: string;
-	left: string;
-	right: string;
-	width: string;
 	overflow: string;
+	paddingRight: string;
 };
 
 let activeLocks = 0;
-let lockedScrollY = 0;
 let snapshot: BodyStyleSnapshot | null = null;
-
-const captureBodyStyles = (body: HTMLElement): BodyStyleSnapshot => ({
-	position: body.style.position,
-	top: body.style.top,
-	left: body.style.left,
-	right: body.style.right,
-	width: body.style.width,
-	overflow: body.style.overflow,
-});
 
 const applyBodyLock = () => {
 	if (typeof window === "undefined") {
@@ -35,15 +24,18 @@ const applyBodyLock = () => {
 	}
 
 	if (activeLocks === 0) {
-		snapshot = captureBodyStyles(body);
-		lockedScrollY = window.scrollY;
+		// Calculate scrollbar width
+		const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+		
+		snapshot = {
+			overflow: body.style.overflow,
+			paddingRight: body.style.paddingRight,
+		};
 
-		body.style.position = "fixed";
-		body.style.top = `-${lockedScrollY}px`;
-		body.style.left = "0";
-		body.style.right = "0";
-		body.style.width = "100%";
 		body.style.overflow = "hidden";
+		if (scrollbarWidth > 0) {
+			body.style.paddingRight = `${scrollbarWidth}px`;
+		}
 	}
 
 	activeLocks += 1;
@@ -65,20 +57,14 @@ const releaseBodyLock = () => {
 	}
 
 	if (snapshot) {
-		body.style.position = snapshot.position;
-		body.style.top = snapshot.top;
-		body.style.left = snapshot.left;
-		body.style.right = snapshot.right;
-		body.style.width = snapshot.width;
 		body.style.overflow = snapshot.overflow;
+		body.style.paddingRight = snapshot.paddingRight;
 		snapshot = null;
 	}
-
-	window.scrollTo(0, lockedScrollY);
 };
 
 export function useBodyScrollLock(locked: boolean): void {
-	useEffect(() => {
+	useIsomorphicLayoutEffect(() => {
 		if (!locked) {
 			return;
 		}

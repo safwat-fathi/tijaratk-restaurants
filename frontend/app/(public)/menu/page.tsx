@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { menuService } from "@/services/api/menu.service";
+import { listCartItemsFromCookie } from "@/lib/cart/customer-cart-cookie";
 import MenuClient from "./_components/MenuClient";
 
 type MenuPageProps = {
-  searchParams: Promise<{ branchId?: string }>;
+  searchParams: Promise<{ branchId?: string; deliveryServiceCode?: string }>;
 };
 
 async function getMenuData(branchId: string) {
@@ -22,11 +23,24 @@ async function getMenuData(branchId: string) {
 export default async function MenuPage(props: MenuPageProps) {
   const searchParams = await props.searchParams;
   
-  if (!searchParams.branchId) {
+  if (!searchParams.branchId || !searchParams.deliveryServiceCode) {
     redirect("/");
   }
 
-  const categories = await getMenuData(searchParams.branchId);
+  const [categories, initialCartItems] = await Promise.all([
+    getMenuData(searchParams.branchId),
+    listCartItemsFromCookie(
+      searchParams.branchId,
+      searchParams.deliveryServiceCode,
+    ),
+  ]);
 
-  return <MenuClient categories={categories} branchId={searchParams.branchId} />;
+  return (
+    <MenuClient
+      categories={categories}
+      branchId={searchParams.branchId}
+      deliveryServiceCode={searchParams.deliveryServiceCode}
+      initialCartItems={initialCartItems}
+    />
+  );
 }
