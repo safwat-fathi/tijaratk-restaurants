@@ -26,7 +26,6 @@ export async function setCartItemQuantityAction(
       quantity,
     );
     revalidatePath("/menu");
-    revalidatePath("/checkout");
     return { success: true };
   } catch {
     return { success: false, error: "تعذر تحديث السلة" };
@@ -34,12 +33,11 @@ export async function setCartItemQuantityAction(
 }
 
 export async function clearCartAction(): Promise<CartActionResult> {
-  try {
-    await clearCartCookie();
-    revalidatePath("/menu");
-    revalidatePath("/checkout");
-    return { success: true };
-  } catch {
+	try {
+		await clearCartCookie();
+		revalidatePath("/menu");
+		return { success: true };
+	} catch {
     return { success: false, error: "تعذر مسح السلة" };
   }
 }

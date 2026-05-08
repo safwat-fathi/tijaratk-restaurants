@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { ArrowRight, Plus, Minus, ShoppingBag, Trash2 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import { setCartItemQuantityAction } from "@/actions/cart-actions";
@@ -58,7 +57,7 @@ export default function MenuClient({
 	);
 
 	const [activeCategoryId, setActiveCategoryId] = useState<number | null>(
-		displayCategories[0]?.id || null
+		displayCategories[0]?.id || null,
 	);
 
 	const [cart, setCart] = useState<Record<number, CartItem>>(() =>
@@ -66,12 +65,7 @@ export default function MenuClient({
 	);
 	const [isCartOpen, setIsCartOpen] = useState(false);
 	const cartRef = useRef(cart);
-	const router = useRouter();
 
-	const isClickScrolling = useRef(false);
-	const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-	// After - fire and forget, no re-render triggered
 	const debouncedSync = useDebouncedCallback(
 		(itemId: number, newQuantity: number) => {
 			void setCartItemQuantityAction(
@@ -86,27 +80,6 @@ export default function MenuClient({
 	useEffect(() => {
 		cartRef.current = cart;
 	}, [cart]);
-
-	useEffect(() => {
-		const observerCallback: IntersectionObserverCallback = (entries) => {
-			if (isClickScrolling.current) return;
-			for (const entry of entries) {
-				if (entry.isIntersecting) {
-					const id = parseInt(entry.target.id.replace("category-", ""));
-					setActiveCategoryId(id);
-				}
-			}
-		};
-
-		const observer = new IntersectionObserver(observerCallback, {
-			rootMargin: "-120px 0px -80% 0px",
-		});
-
-		const sections = document.querySelectorAll("section[id^='category-']");
-		sections.forEach(section => observer.observe(section));
-
-		return () => observer.disconnect();
-	}, [displayCategories]);
 
 	const updateQuantity = (item: MenuItem, delta: number) => {
 		const currentQuantity = cartRef.current[item.id]?.quantity || 0;
@@ -129,19 +102,15 @@ export default function MenuClient({
 		debouncedSync(item.id, newQuantity);
 	};
 
-	const handleCheckout = () => {
-		setIsCartOpen(false);
-		router.push(
-			`/checkout?branchId=${branchId}&deliveryServiceCode=${deliveryServiceCode}`,
-		);
-	};
-
 	const cartItems = Object.values(cart);
 	const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-	const totalPrice = cartItems.reduce(
+	const subtotal = cartItems.reduce(
 		(acc, item) => acc + Number(item.menuItem.price) * item.quantity,
 		0,
 	);
+	const vatRate = 0.14;
+	const vatAmount = subtotal * vatRate;
+	const totalPrice = subtotal + vatAmount;
 
 	return (
 		<div className="w-full flex flex-col bg-[#fff8f5] min-h-screen pb-32 relative">
@@ -164,21 +133,13 @@ export default function MenuClient({
 				{/* Horizontal Category Bar */}
 				<div className="w-full max-w-3xl mx-auto overflow-x-auto hide-scrollbar border-t border-[#e9e1dc]/50">
 					<ul className="flex items-center px-4 py-3 gap-6 whitespace-nowrap font-noto-sans-arabic text-sm">
-						{displayCategories.map((category) => {
+						{displayCategories.map(category => {
 							const isActive = activeCategoryId === category.id;
 							return (
-							<li key={category.id} id={`tab-${category.id}`}>
-								<Link
-									href={`#category-${category.id}`}
-									onClick={() => {
-										setActiveCategoryId(category.id);
-										
-										isClickScrolling.current = true;
-											if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-											scrollTimeout.current = setTimeout(() => {
-												isClickScrolling.current = false;
-											}, 1000);
-										}}
+								<li key={category.id}>
+									<Link
+										href={`#category-${category.id}`}
+										onClick={() => setActiveCategoryId(category.id)}
 										className={`block px-1 pb-1 border-b-2 transition-colors ${
 											isActive
 												? "border-[#a04632] text-[#812f1d] font-bold"
@@ -339,6 +300,9 @@ export default function MenuClient({
 						</div>
 						<span className="font-noto-sans-arabic font-bold text-lg">
 							{totalPrice.toFixed(2)} ج.م.
+							<span className="text-[10px] font-normal opacity-80 mr-1">
+								شامل الضريبة
+							</span>
 						</span>
 					</button>
 				</div>
@@ -350,20 +314,38 @@ export default function MenuClient({
 				title="السلة"
 				footer={
 					<div className="space-y-6">
-						<div className="flex justify-between items-center">
-							<span className="font-tajawal text-xl text-[#55423e]">
-								الإجمالي
-							</span>
-							<span className="font-noto-sans-arabic font-bold text-2xl text-[#812f1d]">
-								{totalPrice.toFixed(2)} ج.م.
-							</span>
+						<div className="space-y-3">
+							<div className="flex justify-between items-center">
+								<span className="font-tajawal text-sm text-[#89726d]">
+									المجموع
+								</span>
+								<span className="font-noto-sans-arabic text-sm text-[#55423e]">
+									{subtotal.toFixed(2)} ج.م.
+								</span>
+							</div>
+							<div className="flex justify-between items-center">
+								<span className="font-tajawal text-sm text-[#89726d]">
+									ضريبة القيمة المضافة (14%)
+								</span>
+								<span className="font-noto-sans-arabic text-sm text-[#55423e]">
+									{vatAmount.toFixed(2)} ج.م.
+								</span>
+							</div>
+							<div className="border-t border-[#e9e1dc] pt-3 flex justify-between items-center">
+								<span className="font-tajawal font-bold text-xl text-[#1e1b18]">
+									الإجمالي
+								</span>
+								<span className="font-noto-sans-arabic font-bold text-2xl text-[#812f1d]">
+									{totalPrice.toFixed(2)} ج.م.
+								</span>
+							</div>
 						</div>
-						<button
-							onClick={handleCheckout}
+						<Link
+							href={`/checkout?branchId=${branchId}&deliveryServiceCode=${deliveryServiceCode}`}
 							className="w-full bg-[#812f1d] hover:bg-[#a04632] text-white py-4 rounded-[4px] font-aref-ruqaa text-3xl shadow-md transition-colors flex items-center justify-center"
 						>
 							إتمام الطلب
-						</button>
+						</Link>
 					</div>
 				}
 			>

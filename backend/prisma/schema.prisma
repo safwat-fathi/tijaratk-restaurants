@@ -80,6 +80,7 @@ model MvpOrder {
   customerMobile     String          @map("customer_mobile")
   customerAddress    String          @map("customer_address")
   deliveryServiceCode Int            @map("delivery_service_code")
+  remarks            String?
   total              Decimal         @db.Decimal(10, 2)
   status             MvpOrderStatus  @default(pending_pos_export)
   posExportAttempts  Int             @default(0) @map("pos_export_attempts")
@@ -100,6 +101,7 @@ model MvpOrderItem {
   menuItem    MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
   posOrderCode Int     @map("pos_order_code")
   nameSnapshot String  @map("name_snapshot")
+  quantity    Decimal  @default(1) @db.Decimal(10, 3)
   unitPrice   Decimal  @db.Decimal(10, 2) @map("unit_price")
   totalPrice  Decimal  @db.Decimal(10, 2) @map("total_price")
   createdAt   DateTime @default(now()) @map("created_at")

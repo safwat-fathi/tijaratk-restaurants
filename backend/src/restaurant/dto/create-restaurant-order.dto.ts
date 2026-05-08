@@ -1,8 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsNumber, IsString, MaxLength, Min } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
-/** DTO for creating a single-item restaurant order. */
+/** DTO for a submitted restaurant order item. */
+export class CreateRestaurantOrderItemDto {
+  @ApiProperty({ example: 100 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  menuItemId: number;
+
+  @ApiProperty({ example: 2 })
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0.001)
+  quantity: number;
+}
+
+/** DTO for creating a restaurant order from checkout. */
 export class CreateRestaurantOrderDto {
   @ApiProperty({ example: 'صفوت فتحي' })
   @IsString()
@@ -25,11 +50,18 @@ export class CreateRestaurantOrderDto {
   @Min(1)
   deliveryServiceCode: number;
 
-  @ApiProperty({ example: 100 })
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  menuItemId: number;
+  @ApiProperty({ type: [CreateRestaurantOrderItemDto] })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => CreateRestaurantOrderItemDto)
+  items: CreateRestaurantOrderItemDto[];
+
+  @ApiProperty({ example: 'بدون مخلل', required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  remarks?: string;
 
   @ApiProperty({ example: 150 })
   @Type(() => Number)

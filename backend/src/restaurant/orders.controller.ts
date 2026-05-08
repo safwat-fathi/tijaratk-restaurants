@@ -18,9 +18,9 @@ export class OrdersController {
     private readonly restaurantOrdersService: RestaurantOrdersService,
   ) {}
 
-  /** Creates a single-item branch order and exports it to POS. */
+  /** Creates a branch order and exports it to POS. */
   @Post()
-  @ApiOperation({ summary: 'Create a single-item branch order' })
+  @ApiOperation({ summary: 'Create a branch order' })
   @ApiBody({ type: CreateRestaurantOrderDto })
   @ApiResponse({
     status: HttpStatus.CREATED,

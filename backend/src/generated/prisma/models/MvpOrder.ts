@@ -49,6 +49,7 @@ export type MvpOrderMinAggregateOutputType = {
   customerMobile: string | null
   customerAddress: string | null
   deliveryServiceCode: number | null
+  remarks: string | null
   total: runtime.Decimal | null
   status: $Enums.MvpOrderStatus | null
   posExportAttempts: number | null
@@ -64,6 +65,7 @@ export type MvpOrderMaxAggregateOutputType = {
   customerMobile: string | null
   customerAddress: string | null
   deliveryServiceCode: number | null
+  remarks: string | null
   total: runtime.Decimal | null
   status: $Enums.MvpOrderStatus | null
   posExportAttempts: number | null
@@ -79,6 +81,7 @@ export type MvpOrderCountAggregateOutputType = {
   customerMobile: number
   customerAddress: number
   deliveryServiceCode: number
+  remarks: number
   total: number
   status: number
   posExportAttempts: number
@@ -112,6 +115,7 @@ export type MvpOrderMinAggregateInputType = {
   customerMobile?: true
   customerAddress?: true
   deliveryServiceCode?: true
+  remarks?: true
   total?: true
   status?: true
   posExportAttempts?: true
@@ -127,6 +131,7 @@ export type MvpOrderMaxAggregateInputType = {
   customerMobile?: true
   customerAddress?: true
   deliveryServiceCode?: true
+  remarks?: true
   total?: true
   status?: true
   posExportAttempts?: true
@@ -142,6 +147,7 @@ export type MvpOrderCountAggregateInputType = {
   customerMobile?: true
   customerAddress?: true
   deliveryServiceCode?: true
+  remarks?: true
   total?: true
   status?: true
   posExportAttempts?: true
@@ -244,6 +250,7 @@ export type MvpOrderGroupByOutputType = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks: string | null
   total: runtime.Decimal
   status: $Enums.MvpOrderStatus
   posExportAttempts: number
@@ -282,6 +289,7 @@ export type MvpOrderWhereInput = {
   customerMobile?: Prisma.StringFilter<"MvpOrder"> | string
   customerAddress?: Prisma.StringFilter<"MvpOrder"> | string
   deliveryServiceCode?: Prisma.IntFilter<"MvpOrder"> | number
+  remarks?: Prisma.StringNullableFilter<"MvpOrder"> | string | null
   total?: Prisma.DecimalFilter<"MvpOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFilter<"MvpOrder"> | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFilter<"MvpOrder"> | number
@@ -299,6 +307,7 @@ export type MvpOrderOrderByWithRelationInput = {
   customerMobile?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
   deliveryServiceCode?: Prisma.SortOrder
+  remarks?: Prisma.SortOrderInput | Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   posExportAttempts?: Prisma.SortOrder
@@ -319,6 +328,7 @@ export type MvpOrderWhereUniqueInput = Prisma.AtLeast<{
   customerMobile?: Prisma.StringFilter<"MvpOrder"> | string
   customerAddress?: Prisma.StringFilter<"MvpOrder"> | string
   deliveryServiceCode?: Prisma.IntFilter<"MvpOrder"> | number
+  remarks?: Prisma.StringNullableFilter<"MvpOrder"> | string | null
   total?: Prisma.DecimalFilter<"MvpOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFilter<"MvpOrder"> | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFilter<"MvpOrder"> | number
@@ -336,6 +346,7 @@ export type MvpOrderOrderByWithAggregationInput = {
   customerMobile?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
   deliveryServiceCode?: Prisma.SortOrder
+  remarks?: Prisma.SortOrderInput | Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   posExportAttempts?: Prisma.SortOrder
@@ -359,6 +370,7 @@ export type MvpOrderScalarWhereWithAggregatesInput = {
   customerMobile?: Prisma.StringWithAggregatesFilter<"MvpOrder"> | string
   customerAddress?: Prisma.StringWithAggregatesFilter<"MvpOrder"> | string
   deliveryServiceCode?: Prisma.IntWithAggregatesFilter<"MvpOrder"> | number
+  remarks?: Prisma.StringNullableWithAggregatesFilter<"MvpOrder"> | string | null
   total?: Prisma.DecimalWithAggregatesFilter<"MvpOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusWithAggregatesFilter<"MvpOrder"> | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntWithAggregatesFilter<"MvpOrder"> | number
@@ -372,6 +384,7 @@ export type MvpOrderCreateInput = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks?: string | null
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.MvpOrderStatus
   posExportAttempts?: number
@@ -389,6 +402,7 @@ export type MvpOrderUncheckedCreateInput = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks?: string | null
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.MvpOrderStatus
   posExportAttempts?: number
@@ -403,6 +417,7 @@ export type MvpOrderUpdateInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -420,6 +435,7 @@ export type MvpOrderUncheckedUpdateInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -436,6 +452,7 @@ export type MvpOrderCreateManyInput = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks?: string | null
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.MvpOrderStatus
   posExportAttempts?: number
@@ -449,6 +466,7 @@ export type MvpOrderUpdateManyMutationInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -464,6 +482,7 @@ export type MvpOrderUncheckedUpdateManyInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -489,6 +508,7 @@ export type MvpOrderCountOrderByAggregateInput = {
   customerMobile?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
   deliveryServiceCode?: Prisma.SortOrder
+  remarks?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   posExportAttempts?: Prisma.SortOrder
@@ -512,6 +532,7 @@ export type MvpOrderMaxOrderByAggregateInput = {
   customerMobile?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
   deliveryServiceCode?: Prisma.SortOrder
+  remarks?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   posExportAttempts?: Prisma.SortOrder
@@ -527,6 +548,7 @@ export type MvpOrderMinOrderByAggregateInput = {
   customerMobile?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
   deliveryServiceCode?: Prisma.SortOrder
+  remarks?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   posExportAttempts?: Prisma.SortOrder
@@ -590,12 +612,12 @@ export type MvpOrderUncheckedUpdateManyWithoutBranchNestedInput = {
   deleteMany?: Prisma.MvpOrderScalarWhereInput | Prisma.MvpOrderScalarWhereInput[]
 }
 
-export type EnumMvpOrderStatusFieldUpdateOperationsInput = {
-  set?: $Enums.MvpOrderStatus
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type EnumMvpOrderStatusFieldUpdateOperationsInput = {
+  set?: $Enums.MvpOrderStatus
 }
 
 export type MvpOrderCreateNestedOneWithoutItemsInput = {
@@ -617,6 +639,7 @@ export type MvpOrderCreateWithoutBranchInput = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks?: string | null
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.MvpOrderStatus
   posExportAttempts?: number
@@ -632,6 +655,7 @@ export type MvpOrderUncheckedCreateWithoutBranchInput = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks?: string | null
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.MvpOrderStatus
   posExportAttempts?: number
@@ -677,6 +701,7 @@ export type MvpOrderScalarWhereInput = {
   customerMobile?: Prisma.StringFilter<"MvpOrder"> | string
   customerAddress?: Prisma.StringFilter<"MvpOrder"> | string
   deliveryServiceCode?: Prisma.IntFilter<"MvpOrder"> | number
+  remarks?: Prisma.StringNullableFilter<"MvpOrder"> | string | null
   total?: Prisma.DecimalFilter<"MvpOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFilter<"MvpOrder"> | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFilter<"MvpOrder"> | number
@@ -690,6 +715,7 @@ export type MvpOrderCreateWithoutItemsInput = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks?: string | null
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.MvpOrderStatus
   posExportAttempts?: number
@@ -706,6 +732,7 @@ export type MvpOrderUncheckedCreateWithoutItemsInput = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks?: string | null
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.MvpOrderStatus
   posExportAttempts?: number
@@ -735,6 +762,7 @@ export type MvpOrderUpdateWithoutItemsInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -751,6 +779,7 @@ export type MvpOrderUncheckedUpdateWithoutItemsInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -765,6 +794,7 @@ export type MvpOrderCreateManyBranchInput = {
   customerMobile: string
   customerAddress: string
   deliveryServiceCode: number
+  remarks?: string | null
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.MvpOrderStatus
   posExportAttempts?: number
@@ -778,6 +808,7 @@ export type MvpOrderUpdateWithoutBranchInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -793,6 +824,7 @@ export type MvpOrderUncheckedUpdateWithoutBranchInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -808,6 +840,7 @@ export type MvpOrderUncheckedUpdateManyWithoutBranchInput = {
   customerMobile?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryServiceCode?: Prisma.IntFieldUpdateOperationsInput | number
+  remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumMvpOrderStatusFieldUpdateOperationsInput | $Enums.MvpOrderStatus
   posExportAttempts?: Prisma.IntFieldUpdateOperationsInput | number
@@ -854,6 +887,7 @@ export type MvpOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   customerMobile?: boolean
   customerAddress?: boolean
   deliveryServiceCode?: boolean
+  remarks?: boolean
   total?: boolean
   status?: boolean
   posExportAttempts?: boolean
@@ -872,6 +906,7 @@ export type MvpOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   customerMobile?: boolean
   customerAddress?: boolean
   deliveryServiceCode?: boolean
+  remarks?: boolean
   total?: boolean
   status?: boolean
   posExportAttempts?: boolean
@@ -888,6 +923,7 @@ export type MvpOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   customerMobile?: boolean
   customerAddress?: boolean
   deliveryServiceCode?: boolean
+  remarks?: boolean
   total?: boolean
   status?: boolean
   posExportAttempts?: boolean
@@ -904,6 +940,7 @@ export type MvpOrderSelectScalar = {
   customerMobile?: boolean
   customerAddress?: boolean
   deliveryServiceCode?: boolean
+  remarks?: boolean
   total?: boolean
   status?: boolean
   posExportAttempts?: boolean
@@ -912,7 +949,7 @@ export type MvpOrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MvpOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "branchId" | "customerName" | "customerMobile" | "customerAddress" | "deliveryServiceCode" | "total" | "status" | "posExportAttempts" | "posLastExportError" | "createdAt" | "updatedAt", ExtArgs["result"]["mvpOrder"]>
+export type MvpOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "branchId" | "customerName" | "customerMobile" | "customerAddress" | "deliveryServiceCode" | "remarks" | "total" | "status" | "posExportAttempts" | "posLastExportError" | "createdAt" | "updatedAt", ExtArgs["result"]["mvpOrder"]>
 export type MvpOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   items?: boolean | Prisma.MvpOrder$itemsArgs<ExtArgs>
@@ -938,6 +975,7 @@ export type $MvpOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     customerMobile: string
     customerAddress: string
     deliveryServiceCode: number
+    remarks: string | null
     total: runtime.Decimal
     status: $Enums.MvpOrderStatus
     posExportAttempts: number
@@ -1375,6 +1413,7 @@ export interface MvpOrderFieldRefs {
   readonly customerMobile: Prisma.FieldRef<"MvpOrder", 'String'>
   readonly customerAddress: Prisma.FieldRef<"MvpOrder", 'String'>
   readonly deliveryServiceCode: Prisma.FieldRef<"MvpOrder", 'Int'>
+  readonly remarks: Prisma.FieldRef<"MvpOrder", 'String'>
   readonly total: Prisma.FieldRef<"MvpOrder", 'Decimal'>
   readonly status: Prisma.FieldRef<"MvpOrder", 'MvpOrderStatus'>
   readonly posExportAttempts: Prisma.FieldRef<"MvpOrder", 'Int'>

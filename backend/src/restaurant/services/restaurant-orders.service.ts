@@ -18,13 +18,14 @@ export class RestaurantOrdersService {
     private readonly restaurantService: RestaurantService,
   ) {}
 
-  /** Creates a local single-item order and immediately exports it to POS. */
+  /** Creates a local order and immediately exports its items to POS. */
   async createOrder(branchId: number, dto: CreateRestaurantOrderDto) {
     await this.restaurantService.assertBranchExists(branchId);
+    const menuItemIds = dto.items.map((item) => item.menuItemId);
 
-    const [menuItem, deliveryService] = await Promise.all([
-      this.prisma.menuItem.findFirst({
-        where: { id: dto.menuItemId, isActive: true, deletedAt: null },
+    const [menuItems, deliveryService] = await Promise.all([
+      this.prisma.menuItem.findMany({
+        where: { id: { in: menuItemIds }, isActive: true, deletedAt: null },
       }),
       this.prisma.deliveryService.findFirst({
         where: {
@@ -36,12 +37,21 @@ export class RestaurantOrdersService {
       }),
     ]);
 
-    if (!menuItem) {
-      throw new NotFoundException(`Menu item ${dto.menuItemId} not found`);
+    const menuItemsById = new Map(
+      menuItems.map((menuItem) => [menuItem.id, menuItem]),
+    );
+    const missingMenuItemId = menuItemIds.find(
+      (menuItemId) => !menuItemsById.has(menuItemId),
+    );
+
+    if (missingMenuItemId) {
+      throw new NotFoundException(`Menu item ${missingMenuItemId} not found`);
     }
     if (!deliveryService) {
       throw new BadRequestException('Invalid delivery service for branch');
     }
+
+    const remarks = dto.remarks?.trim() ?? '';
 
     const order = await this.prisma.mvpOrder.create({
       data: {
@@ -50,28 +60,41 @@ export class RestaurantOrdersService {
         customerMobile: dto.customerMobile.trim(),
         customerAddress: dto.customerAddress.trim(),
         deliveryServiceCode: dto.deliveryServiceCode,
+        remarks: remarks || null,
         total: dto.total,
         items: {
-          create: {
-            menuItemId: menuItem.id,
-            posOrderCode: menuItem.posOrderCode,
-            nameSnapshot: menuItem.name,
-            unitPrice: menuItem.price,
-            totalPrice: dto.total,
-          },
+          create: dto.items.map((item) => {
+            const menuItem = menuItemsById.get(item.menuItemId)!;
+            const unitPrice = Number(menuItem.price);
+
+            return {
+              menuItemId: menuItem.id,
+              posOrderCode: menuItem.posOrderCode,
+              nameSnapshot: menuItem.name,
+              quantity: item.quantity,
+              unitPrice: menuItem.price,
+              totalPrice: unitPrice * item.quantity,
+            };
+          }),
         },
       },
       include: { items: true },
     });
 
     try {
-      await this.posSqlService.addCustomerOrder({
-        customerName: order.customerName,
-        customerMobile: order.customerMobile,
-        customerAddress: order.customerAddress,
-        deliveryServiceCode: order.deliveryServiceCode,
-        orderCode: menuItem.posOrderCode,
-      });
+      for (const item of dto.items) {
+        const menuItem = menuItemsById.get(item.menuItemId)!;
+
+        await this.posSqlService.addCustomerOrder({
+          customerName: order.customerName,
+          customerMobile: order.customerMobile,
+          customerAddress: order.customerAddress,
+          deliveryServiceCode: order.deliveryServiceCode,
+          orderCode: menuItem.posOrderCode,
+          orderQty: item.quantity,
+          orderRemarks: remarks,
+        });
+      }
 
       return this.prisma.mvpOrder.update({
         where: { id: order.id },

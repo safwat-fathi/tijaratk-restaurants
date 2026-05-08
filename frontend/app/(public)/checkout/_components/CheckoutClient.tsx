@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
-import { clearCartAction } from "@/actions/cart-actions";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { submitCheckoutOrderAction } from "@/actions/checkout-actions";
 import { MenuItem } from "@/types/models/menu";
 import { DeliveryService } from "@/types/models/delivery-service";
 
@@ -26,84 +25,33 @@ export default function CheckoutClient({
   selectedDeliveryService,
   initialCartItems,
 }: CheckoutClientProps) {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     customerName: "",
     customerMobile: "",
     customerAddress: "",
+    remarks: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [state, formAction, isSubmitting] = useActionState(
+    submitCheckoutOrderAction,
+    { success: false },
+  );
 
   const cartItems = initialCartItems;
-  const totalPrice = cartItems.reduce(
+  const subtotal = cartItems.reduce(
     (acc, item) => acc + Number(item.menuItem.price) * item.quantity,
     0
   );
 
   const deliveryFee = Number(selectedDeliveryService.amount) || 0;
-  const finalTotal = totalPrice + deliveryFee;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (cartItems.length === 0) return;
-
-    setIsSubmitting(true);
-    setError(null);
-
-    // MVP constraint: Backend only supports a single item per order. 
-    // We send the first item in the cart.
-    const primaryItem = cartItems[0].menuItem;
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/branches/${branchId}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerName: formData.customerName,
-          customerMobile: formData.customerMobile,
-          customerAddress: formData.customerAddress,
-          deliveryServiceCode: selectedDeliveryService.posDeliveryServiceCode,
-          menuItemId: primaryItem.id,
-          total: finalTotal, // Send total order price including delivery
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || 'فشل في إرسال الطلب');
-      }
-
-      // Success
-      await clearCartAction();
-      setIsSuccess(true);
-      
-      // Redirect after 3 seconds
-      setTimeout(() => {
-        router.push(`/track-orders?mobile=${formData.customerMobile}`);
-      }, 3000);
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'فشل في إرسال الطلب');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen bg-[#fff8f5] flex flex-col items-center justify-center p-4 text-center">
-        <CheckCircle2 className="w-20 h-20 text-green-600 mb-6" />
-        <h1 className="font-aref-ruqaa text-4xl text-[#1e1b18] mb-2">تم استلام طلبك بنجاح!</h1>
-        <p className="font-tajawal text-lg text-[#55423e] mb-8">
-          جاري تجهيز طلبك. سيتم تحويلك لصفحة متابعة الطلب...
-        </p>
-      </div>
-    );
-  }
+  const vatRate = 0.14;
+  const vatAmount = (subtotal + deliveryFee) * vatRate;
+  const finalTotal = subtotal + deliveryFee + vatAmount;
+  const checkoutItems = JSON.stringify(
+    cartItems.map((item) => ({
+      menuItemId: item.menuItem.id,
+      quantity: item.quantity,
+    }))
+  );
 
   return (
     <div className="w-full flex flex-col bg-[#fff8f5] min-h-screen pb-24">
@@ -139,15 +87,19 @@ export default function CheckoutClient({
           </div>
           <div className="flex justify-between items-center pt-4 border-t border-[#f5ece7] text-sm font-tajawal text-[#55423e]">
             <span>المجموع</span>
-            <span className="font-noto-sans-arabic font-bold">{totalPrice.toFixed(2)} ج.م.</span>
+            <span className="font-noto-sans-arabic font-bold">{subtotal.toFixed(2)} ج.م.</span>
           </div>
           <div className="flex justify-between items-center pt-2 text-sm font-tajawal text-[#55423e]">
             <span>منطقة التوصيل</span>
             <span>{selectedDeliveryService.name}</span>
           </div>
-          <div className="flex justify-between items-center pt-2 pb-4 text-sm font-tajawal text-[#55423e] border-b border-[#f5ece7]">
+          <div className="flex justify-between items-center pt-2 text-sm font-tajawal text-[#55423e]">
             <span>رسوم التوصيل</span>
             <span className="font-noto-sans-arabic font-bold">{deliveryFee.toFixed(2)} ج.م.</span>
+          </div>
+          <div className="flex justify-between items-center pt-2 pb-4 text-sm font-tajawal text-[#55423e] border-b border-[#f5ece7]">
+            <span>ضريبة القيمة المضافة (14%)</span>
+            <span className="font-noto-sans-arabic font-bold">{vatAmount.toFixed(2)} ج.م.</span>
           </div>
           <div className="flex justify-between items-center pt-4">
             <span className="font-tajawal font-bold text-lg text-[#1e1b18]">الإجمالي النهائي</span>
@@ -159,10 +111,20 @@ export default function CheckoutClient({
         <section className="bg-white border border-[#e9e1dc] rounded-xl p-5 shadow-sm">
           <h2 className="font-aref-ruqaa text-2xl text-[#1e1b18] mb-6">بيانات التوصيل</h2>
           
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
+          <form action={formAction} className="space-y-5">
+            <input type="hidden" name="branchId" value={branchId} />
+            <input type="hidden" name="deliveryServiceCode" value={deliveryServiceCode} />
+            <input
+              type="hidden"
+              name="posDeliveryServiceCode"
+              value={selectedDeliveryService.posDeliveryServiceCode}
+            />
+            <input type="hidden" name="items" value={checkoutItems} />
+            <input type="hidden" name="total" value={finalTotal.toFixed(2)} />
+
+            {state.message && !state.success && (
               <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-tajawal">
-                {error}
+                {state.message}
               </div>
             )}
 
@@ -171,6 +133,7 @@ export default function CheckoutClient({
               <input 
                 type="text" 
                 id="customerName" 
+                name="customerName"
                 required
                 value={formData.customerName}
                 onChange={(e) => setFormData({...formData, customerName: e.target.value})}
@@ -184,6 +147,7 @@ export default function CheckoutClient({
               <input 
                 type="tel" 
                 id="customerMobile" 
+                name="customerMobile"
                 required
                 value={formData.customerMobile}
                 onChange={(e) => setFormData({...formData, customerMobile: e.target.value})}
@@ -197,12 +161,27 @@ export default function CheckoutClient({
               <label htmlFor="customerAddress" className="block text-sm font-bold text-[#1e1b18] font-tajawal">عنوان التوصيل</label>
               <textarea 
                 id="customerAddress" 
+                name="customerAddress"
                 required
                 rows={3}
                 value={formData.customerAddress}
                 onChange={(e) => setFormData({...formData, customerAddress: e.target.value})}
                 className="w-full p-3 border border-[#dcc1bb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#812f1d]/50 focus:border-[#812f1d] font-tajawal text-[#1e1b18] bg-[#fdfaf8] resize-none"
                 placeholder="أدخل عنوان التوصيل بالتفصيل (الحي، المجاورة، الشارع، رقم العمارة)"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="remarks" className="block text-sm font-bold text-[#1e1b18] font-tajawal">ملاحظات الطلب</label>
+              <textarea
+                id="remarks"
+                name="remarks"
+                rows={2}
+                maxLength={200}
+                value={formData.remarks}
+                onChange={(e) => setFormData({...formData, remarks: e.target.value})}
+                className="w-full p-3 border border-[#dcc1bb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#812f1d]/50 focus:border-[#812f1d] font-tajawal text-[#1e1b18] bg-[#fdfaf8] resize-none"
+                placeholder="مثال: بدون مخلل أو أي ملاحظات إضافية"
               />
             </div>
 

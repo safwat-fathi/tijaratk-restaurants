@@ -52,6 +52,8 @@ export class PosSqlService implements OnModuleDestroy {
     customerAddress: string;
     deliveryServiceCode: number;
     orderCode: number;
+    orderQty: number;
+    orderRemarks: string;
   }): Promise<void> {
     const pool = await this.getPool();
     await pool
@@ -61,6 +63,8 @@ export class PosSqlService implements OnModuleDestroy {
       .input('CustomerAddress', params.customerAddress)
       .input('DeliveryServiceCode', params.deliveryServiceCode)
       .input('OrderCode', params.orderCode)
+      .input('OrderQty', params.orderQty)
+      .input('OrderRemarks', params.orderRemarks)
       .execute('dbo.PS_AddApplicationCustomerOrder');
   }
 
@@ -71,11 +75,11 @@ export class PosSqlService implements OnModuleDestroy {
     }
 
     const config: SqlConfig = {
-      server: process.env.POS_DB_HOST!,
+      server: process.env.POS_DB_HOST,
       port: Number(process.env.POS_DB_PORT || 1433),
-      user: process.env.POS_DB_USER!,
-      password: process.env.POS_DB_PASS!,
-      database: process.env.POS_DB_NAME!,
+      user: process.env.POS_DB_USER,
+      password: process.env.POS_DB_PASS,
+      database: process.env.POS_DB_NAME,
       options: {
         encrypt: process.env.POS_DB_ENCRYPT === 'true',
         trustServerCertificate: process.env.POS_DB_TRUST_CERT !== 'false',

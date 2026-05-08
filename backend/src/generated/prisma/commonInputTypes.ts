@@ -196,13 +196,6 @@ export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
 }
 
-export type EnumMvpOrderStatusFilter<$PrismaModel = never> = {
-  equals?: $Enums.MvpOrderStatus | Prisma.EnumMvpOrderStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel> | $Enums.MvpOrderStatus
-}
-
 export type StringNullableFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
@@ -218,14 +211,11 @@ export type StringNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedStringNullableFilter<$PrismaModel> | string | null
 }
 
-export type EnumMvpOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
+export type EnumMvpOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.MvpOrderStatus | Prisma.EnumMvpOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumMvpOrderStatusWithAggregatesFilter<$PrismaModel> | $Enums.MvpOrderStatus
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel>
+  not?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel> | $Enums.MvpOrderStatus
 }
 
 export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -244,6 +234,16 @@ export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedStringNullableFilter<$PrismaModel>
   _max?: Prisma.NestedStringNullableFilter<$PrismaModel>
+}
+
+export type EnumMvpOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MvpOrderStatus | Prisma.EnumMvpOrderStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMvpOrderStatusWithAggregatesFilter<$PrismaModel> | $Enums.MvpOrderStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel>
 }
 
 export type NestedIntFilter<$PrismaModel = never> = {
@@ -443,13 +443,6 @@ export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
 }
 
-export type NestedEnumMvpOrderStatusFilter<$PrismaModel = never> = {
-  equals?: $Enums.MvpOrderStatus | Prisma.EnumMvpOrderStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel> | $Enums.MvpOrderStatus
-}
-
 export type NestedStringNullableFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
@@ -464,14 +457,11 @@ export type NestedStringNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedStringNullableFilter<$PrismaModel> | string | null
 }
 
-export type NestedEnumMvpOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
+export type NestedEnumMvpOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.MvpOrderStatus | Prisma.EnumMvpOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumMvpOrderStatusWithAggregatesFilter<$PrismaModel> | $Enums.MvpOrderStatus
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel>
+  not?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel> | $Enums.MvpOrderStatus
 }
 
 export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -489,6 +479,16 @@ export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedStringNullableFilter<$PrismaModel>
   _max?: Prisma.NestedStringNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumMvpOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MvpOrderStatus | Prisma.EnumMvpOrderStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MvpOrderStatus[] | Prisma.ListEnumMvpOrderStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMvpOrderStatusWithAggregatesFilter<$PrismaModel> | $Enums.MvpOrderStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMvpOrderStatusFilter<$PrismaModel>
 }
 
 
