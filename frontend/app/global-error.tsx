@@ -1,92 +1,254 @@
 "use client";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Tajawal } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const tajawal = Tajawal({
+	subsets: ["arabic"],
+	variable: "--font-tajawal",
+	weight: ["300", "400", "500", "700"],
+	display: "swap",
 });
 
 export default function GlobalError({
-  error,
-  reset,
+	error,
+	reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+	error: Error & { digest?: string };
+	reset: () => void;
 }) {
-  return (
-		<html lang="en">
+	return (
+		<html lang="ar" dir="rtl" className="scroll-smooth">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white`}
+				className={`${tajawal.variable} antialiased`}
+				style={{
+					fontFamily: "var(--font-tajawal), sans-serif",
+					background: "hsl(var(--background))",
+					color: "hsl(var(--foreground))",
+					margin: 0,
+					padding: 0,
+				}}
 			>
-				<div className="min-h-screen flex flex-col items-center justify-center p-4">
-					<div className="w-full max-w-md text-center space-y-8">
+				<div
+					style={{
+						minHeight: "100svh",
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+						justifyContent: "center",
+						padding: "1rem",
+					}}
+				>
+					<div
+						style={{
+							width: "100%",
+							maxWidth: "28rem",
+							textAlign: "center",
+							display: "flex",
+							flexDirection: "column",
+							gap: "2rem",
+						}}
+					>
 						{/* Icon */}
-						<div className="mx-auto w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
+						<div
+							style={{
+								margin: "0 auto",
+								width: "5rem",
+								height: "5rem",
+								borderRadius: "9999px",
+								background: "hsl(var(--destructive) / 0.08)",
+								border: "2px solid hsl(var(--destructive) / 0.2)",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								animation: "pulseSoft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+							}}
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
 								fill="none"
 								stroke="currentColor"
-								className="w-10 h-10 text-red-500"
+								style={{
+									width: "2.5rem",
+									height: "2.5rem",
+									color: "hsl(var(--destructive))",
+								}}
 								strokeWidth="2"
 								strokeLinecap="round"
 								strokeLinejoin="round"
 							>
-								<circle cx="12" cy="12" r="10"></circle>
-								<line x1="12" y1="8" x2="12" y2="12"></line>
-								<line x1="12" y1="16" x2="12.01" y2="16"></line>
+								<circle cx="12" cy="12" r="10" />
+								<line x1="12" y1="8" x2="12" y2="12" />
+								<line x1="12" y1="16" x2="12.01" y2="16" />
 							</svg>
 						</div>
 
 						{/* Content */}
-						<div className="space-y-2">
-							<h2 className="text-3xl font-bold tracking-tight text-gray-900">
-								System Error
-							</h2>
-							<p className="text-gray-500">
-								We apologize for the inconvenience. An unexpected error has
-								occurred in the application.
+						<div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+							<h1
+								style={{
+									fontSize: "1.875rem",
+									fontWeight: "700",
+									letterSpacing: "-0.025em",
+									color: "hsl(var(--foreground))",
+									margin: 0,
+								}}
+							>
+								حدث خطأ في النظام
+							</h1>
+							<p
+								style={{
+									color: "hsl(var(--muted-foreground))",
+									margin: 0,
+									lineHeight: "1.6",
+								}}
+							>
+								نعتذر عن الإزعاج. حدث خطأ غير متوقع في التطبيق.
 							</p>
 						</div>
 
-						{/* Error Details (Collapsible/Optional) */}
-						<div className="w-full bg-gray-50 rounded-lg p-4 text-end border border-gray-100 overflow-hidden">
-							<div className="flex items-center gap-2 mb-2">
-								<span className="w-2 h-2 rounded-full bg-red-400"></span>
-								<span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-									Error Details
+						{/* Error Details */}
+						<div
+							style={{
+								width: "100%",
+								background: "hsl(var(--muted))",
+								borderRadius: "0.5rem",
+								padding: "1rem",
+								textAlign: "right",
+								border: "1px solid hsl(var(--border))",
+								overflow: "hidden",
+							}}
+						>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "center",
+									gap: "0.5rem",
+									marginBottom: "0.5rem",
+								}}
+							>
+								<span
+									style={{
+										width: "0.5rem",
+										height: "0.5rem",
+										borderRadius: "9999px",
+										background: "hsl(var(--destructive))",
+										flexShrink: 0,
+									}}
+								/>
+								<span
+									style={{
+										fontSize: "0.75rem",
+										fontWeight: "600",
+										color: "hsl(var(--muted-foreground))",
+										textTransform: "uppercase",
+										letterSpacing: "0.05em",
+									}}
+								>
+									تفاصيل الخطأ
 								</span>
 							</div>
-							<p className="text-sm font-mono text-gray-700 break-words leading-relaxed">
-								{error.message || "Unknown error occurred"}
+							<p
+								style={{
+									fontSize: "0.875rem",
+									fontFamily: "monospace",
+									color: "hsl(var(--foreground))",
+									wordBreak: "break-word",
+									lineHeight: "1.6",
+									margin: 0,
+								}}
+							>
+								{error.message || "حدث خطأ غير متوقع"}
 							</p>
 							{error.digest && (
-								<p className="text-xs font-mono text-gray-400 mt-2 pt-2 border-t border-gray-200">
+								<p
+									style={{
+										fontSize: "0.75rem",
+										fontFamily: "monospace",
+										color: "hsl(var(--muted-foreground))",
+										marginTop: "0.5rem",
+										paddingTop: "0.5rem",
+										borderTop: "1px solid hsl(var(--border))",
+										marginBottom: 0,
+									}}
+								>
 									Digest ID: {error.digest}
 								</p>
 							)}
 						</div>
 
 						{/* Actions */}
-						<div className="flex flex-col sm:flex-row gap-3 pt-4">
+						<div
+							style={{
+								display: "flex",
+								flexDirection: "column",
+								gap: "0.75rem",
+								paddingTop: "0.5rem",
+							}}
+						>
+							{/* Primary — retry */}
 							<button
 								onClick={() => reset()}
-								className="flex-1 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-all active:scale-[0.98]"
+								style={{
+									flex: 1,
+									borderRadius: "0.5rem",
+									background: "hsl(var(--primary))",
+									padding: "0.625rem 1rem",
+									fontSize: "0.875rem",
+									fontWeight: "600",
+									color: "hsl(var(--primary-foreground))",
+									border: "none",
+									cursor: "pointer",
+									transition: "opacity 0.15s, transform 0.1s",
+									fontFamily: "var(--font-tajawal), sans-serif",
+								}}
+								onMouseEnter={(e) =>
+									(e.currentTarget.style.opacity = "0.9")
+								}
+								onMouseLeave={(e) =>
+									(e.currentTarget.style.opacity = "1")
+								}
+								onMouseDown={(e) =>
+									(e.currentTarget.style.transform = "scale(0.98)")
+								}
+								onMouseUp={(e) =>
+									(e.currentTarget.style.transform = "scale(1)")
+								}
 							>
-								Try Again
+								حاول مرة أخرى
 							</button>
+
+							{/* Secondary — home */}
 							<button
 								onClick={() => (window.location.href = "/")}
-								className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-all active:scale-[0.98]"
+								style={{
+									flex: 1,
+									borderRadius: "0.5rem",
+									background: "transparent",
+									padding: "0.625rem 1rem",
+									fontSize: "0.875rem",
+									fontWeight: "600",
+									color: "hsl(var(--foreground))",
+									border: "1px solid hsl(var(--border))",
+									cursor: "pointer",
+									transition: "background 0.15s, transform 0.1s",
+									fontFamily: "var(--font-tajawal), sans-serif",
+								}}
+								onMouseEnter={(e) =>
+									(e.currentTarget.style.background = "hsl(var(--muted))")
+								}
+								onMouseLeave={(e) =>
+									(e.currentTarget.style.background = "transparent")
+								}
+								onMouseDown={(e) =>
+									(e.currentTarget.style.transform = "scale(0.98)")
+								}
+								onMouseUp={(e) =>
+									(e.currentTarget.style.transform = "scale(1)")
+								}
 							>
-								Return Home
+								الصفحة الرئيسية
 							</button>
 						</div>
 					</div>

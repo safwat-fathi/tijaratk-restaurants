@@ -31,7 +31,7 @@ export type MvpOrderItemAvgAggregateOutputType = {
   orderId: number | null
   menuItemId: number | null
   posOrderCode: number | null
-  quantity: runtime.Decimal | null
+  quantity: number | null
   unitPrice: runtime.Decimal | null
   totalPrice: runtime.Decimal | null
 }
@@ -41,7 +41,7 @@ export type MvpOrderItemSumAggregateOutputType = {
   orderId: number | null
   menuItemId: number | null
   posOrderCode: number | null
-  quantity: runtime.Decimal | null
+  quantity: number | null
   unitPrice: runtime.Decimal | null
   totalPrice: runtime.Decimal | null
 }
@@ -52,7 +52,7 @@ export type MvpOrderItemMinAggregateOutputType = {
   menuItemId: number | null
   posOrderCode: number | null
   nameSnapshot: string | null
-  quantity: runtime.Decimal | null
+  quantity: number | null
   unitPrice: runtime.Decimal | null
   totalPrice: runtime.Decimal | null
   createdAt: Date | null
@@ -65,7 +65,7 @@ export type MvpOrderItemMaxAggregateOutputType = {
   menuItemId: number | null
   posOrderCode: number | null
   nameSnapshot: string | null
-  quantity: runtime.Decimal | null
+  quantity: number | null
   unitPrice: runtime.Decimal | null
   totalPrice: runtime.Decimal | null
   createdAt: Date | null
@@ -239,7 +239,7 @@ export type MvpOrderItemGroupByOutputType = {
   menuItemId: number
   posOrderCode: number
   nameSnapshot: string
-  quantity: runtime.Decimal
+  quantity: number
   unitPrice: runtime.Decimal
   totalPrice: runtime.Decimal
   createdAt: Date
@@ -275,7 +275,7 @@ export type MvpOrderItemWhereInput = {
   menuItemId?: Prisma.IntFilter<"MvpOrderItem"> | number
   posOrderCode?: Prisma.IntFilter<"MvpOrderItem"> | number
   nameSnapshot?: Prisma.StringFilter<"MvpOrderItem"> | string
-  quantity?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFilter<"MvpOrderItem"> | number
   unitPrice?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"MvpOrderItem"> | Date | string
@@ -308,7 +308,7 @@ export type MvpOrderItemWhereUniqueInput = Prisma.AtLeast<{
   menuItemId?: Prisma.IntFilter<"MvpOrderItem"> | number
   posOrderCode?: Prisma.IntFilter<"MvpOrderItem"> | number
   nameSnapshot?: Prisma.StringFilter<"MvpOrderItem"> | string
-  quantity?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFilter<"MvpOrderItem"> | number
   unitPrice?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"MvpOrderItem"> | Date | string
@@ -344,7 +344,7 @@ export type MvpOrderItemScalarWhereWithAggregatesInput = {
   menuItemId?: Prisma.IntWithAggregatesFilter<"MvpOrderItem"> | number
   posOrderCode?: Prisma.IntWithAggregatesFilter<"MvpOrderItem"> | number
   nameSnapshot?: Prisma.StringWithAggregatesFilter<"MvpOrderItem"> | string
-  quantity?: Prisma.DecimalWithAggregatesFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntWithAggregatesFilter<"MvpOrderItem"> | number
   unitPrice?: Prisma.DecimalWithAggregatesFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalWithAggregatesFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MvpOrderItem"> | Date | string
@@ -354,7 +354,7 @@ export type MvpOrderItemScalarWhereWithAggregatesInput = {
 export type MvpOrderItemCreateInput = {
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -369,7 +369,7 @@ export type MvpOrderItemUncheckedCreateInput = {
   menuItemId: number
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -379,7 +379,7 @@ export type MvpOrderItemUncheckedCreateInput = {
 export type MvpOrderItemUpdateInput = {
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -394,7 +394,7 @@ export type MvpOrderItemUncheckedUpdateInput = {
   menuItemId?: Prisma.IntFieldUpdateOperationsInput | number
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -407,7 +407,7 @@ export type MvpOrderItemCreateManyInput = {
   menuItemId: number
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -417,7 +417,7 @@ export type MvpOrderItemCreateManyInput = {
 export type MvpOrderItemUpdateManyMutationInput = {
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -430,7 +430,7 @@ export type MvpOrderItemUncheckedUpdateManyInput = {
   menuItemId?: Prisma.IntFieldUpdateOperationsInput | number
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -593,7 +593,7 @@ export type MvpOrderItemUncheckedUpdateManyWithoutOrderNestedInput = {
 export type MvpOrderItemCreateWithoutMenuItemInput = {
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -606,7 +606,7 @@ export type MvpOrderItemUncheckedCreateWithoutMenuItemInput = {
   orderId: number
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -648,7 +648,7 @@ export type MvpOrderItemScalarWhereInput = {
   menuItemId?: Prisma.IntFilter<"MvpOrderItem"> | number
   posOrderCode?: Prisma.IntFilter<"MvpOrderItem"> | number
   nameSnapshot?: Prisma.StringFilter<"MvpOrderItem"> | string
-  quantity?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFilter<"MvpOrderItem"> | number
   unitPrice?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFilter<"MvpOrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"MvpOrderItem"> | Date | string
@@ -658,7 +658,7 @@ export type MvpOrderItemScalarWhereInput = {
 export type MvpOrderItemCreateWithoutOrderInput = {
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -671,7 +671,7 @@ export type MvpOrderItemUncheckedCreateWithoutOrderInput = {
   menuItemId: number
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -709,7 +709,7 @@ export type MvpOrderItemCreateManyMenuItemInput = {
   orderId: number
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -719,7 +719,7 @@ export type MvpOrderItemCreateManyMenuItemInput = {
 export type MvpOrderItemUpdateWithoutMenuItemInput = {
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -732,7 +732,7 @@ export type MvpOrderItemUncheckedUpdateWithoutMenuItemInput = {
   orderId?: Prisma.IntFieldUpdateOperationsInput | number
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -744,7 +744,7 @@ export type MvpOrderItemUncheckedUpdateManyWithoutMenuItemInput = {
   orderId?: Prisma.IntFieldUpdateOperationsInput | number
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -756,7 +756,7 @@ export type MvpOrderItemCreateManyOrderInput = {
   menuItemId: number
   posOrderCode: number
   nameSnapshot: string
-  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -766,7 +766,7 @@ export type MvpOrderItemCreateManyOrderInput = {
 export type MvpOrderItemUpdateWithoutOrderInput = {
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -779,7 +779,7 @@ export type MvpOrderItemUncheckedUpdateWithoutOrderInput = {
   menuItemId?: Prisma.IntFieldUpdateOperationsInput | number
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -791,7 +791,7 @@ export type MvpOrderItemUncheckedUpdateManyWithoutOrderInput = {
   menuItemId?: Prisma.IntFieldUpdateOperationsInput | number
   posOrderCode?: Prisma.IntFieldUpdateOperationsInput | number
   nameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -884,7 +884,7 @@ export type $MvpOrderItemPayload<ExtArgs extends runtime.Types.Extensions.Intern
     menuItemId: number
     posOrderCode: number
     nameSnapshot: string
-    quantity: runtime.Decimal
+    quantity: number
     unitPrice: runtime.Decimal
     totalPrice: runtime.Decimal
     createdAt: Date
@@ -1319,7 +1319,7 @@ export interface MvpOrderItemFieldRefs {
   readonly menuItemId: Prisma.FieldRef<"MvpOrderItem", 'Int'>
   readonly posOrderCode: Prisma.FieldRef<"MvpOrderItem", 'Int'>
   readonly nameSnapshot: Prisma.FieldRef<"MvpOrderItem", 'String'>
-  readonly quantity: Prisma.FieldRef<"MvpOrderItem", 'Decimal'>
+  readonly quantity: Prisma.FieldRef<"MvpOrderItem", 'Int'>
   readonly unitPrice: Prisma.FieldRef<"MvpOrderItem", 'Decimal'>
   readonly totalPrice: Prisma.FieldRef<"MvpOrderItem", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"MvpOrderItem", 'DateTime'>
