@@ -60,7 +60,9 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       case 'P2002': {
         status = HttpStatus.CONFLICT;
         const target = exception.meta?.target;
-        message = target ? `Duplicate entry for ${String(target)}` : 'Duplicate entry';
+        message = target
+          ? `Duplicate entry for ${String(target)}`
+          : 'Duplicate entry';
         break;
       }
       case 'P2003': {

@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-
 async function bootstrap() {
   const logger = new Logger('Seed');
   logger.log('Seeding...');

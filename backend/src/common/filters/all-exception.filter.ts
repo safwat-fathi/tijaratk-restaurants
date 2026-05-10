@@ -104,7 +104,9 @@ export class AllExceptionFilter implements ExceptionFilter {
       exception instanceof Prisma.PrismaClientRustPanicError ||
       exception instanceof Prisma.PrismaClientInitializationError ||
       exception instanceof Prisma.PrismaClientValidationError ||
-      (typeof exception === 'object' && exception !== null && 'code' in exception)
+      (typeof exception === 'object' &&
+        exception !== null &&
+        'code' in exception)
     ) {
       const details = this.handleDbException(exception);
       status = details.status;
