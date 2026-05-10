@@ -64,4 +64,4 @@ This file provides guidelines for AI agents and coding assistants when working w
 - running full build
 
 **Always read & summarize before proposing a clear plan and write your plan in a markdown file and then ask before implementation / committing.**
-**Write your plan in a markdown file in `.docs/plans` directory in this format `resource_name-action-description.md` and then ask before implementation / committing.**
+**Write your plan in a markdown file in `.docs/plans` directory in this format `resource_name-action-description.md` even if you are in a plan mode you should add the file with the plan. Then ask before implementation / committing.**
