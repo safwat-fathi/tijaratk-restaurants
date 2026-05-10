@@ -166,7 +166,7 @@ export default function StorefrontBranchSelector({
           key={selectedBranch || "delivery-service-combobox"}
           id="delivery-service-combobox"
           label="اختر منطقة التوصيل"
-          placeholder="ابحث عن منطقة التوصيل"
+          placeholder={!selectedBranch ? "اختر فرع أولا" : "ابحث عن منطقة التوصيل"}
           options={deliveryServiceOptions}
           value={selectedDeliveryServiceCode || ""}
           onChange={(nextValue) => setSelectedDeliveryServiceCode(nextValue || null)}

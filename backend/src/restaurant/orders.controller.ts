@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Param,
   ParseIntPipe,
@@ -17,6 +18,20 @@ export class OrdersController {
   constructor(
     private readonly restaurantOrdersService: RestaurantOrdersService,
   ) {}
+
+  /** Retrieves a branch order by ID. */
+  @Get(':orderId')
+  @ApiOperation({ summary: 'Get a branch order by ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Order details including items',
+  })
+  getOrder(
+    @Param('branchId', ParseIntPipe) branchId: number,
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ) {
+    return this.restaurantOrdersService.getOrderById(branchId, orderId);
+  }
 
   /** Creates a branch order and exports it to POS. */
   @Post()

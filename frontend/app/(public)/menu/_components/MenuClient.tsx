@@ -115,7 +115,7 @@ export default function MenuClient({
 	return (
 		<div className="w-full flex flex-col bg-[#fff8f5] min-h-screen pb-32 relative">
 			{/* Sticky Top App Bar */}
-			<header className="sticky top-0 z-40 self-start w-full bg-[#fff8f5]/90 backdrop-blur-md border-b border-[#e9e1dc]">
+			<header className="sticky top-0 z-40 w-full bg-[#fff8f5]/90 backdrop-blur-md border-b border-[#e9e1dc]">
 				<div className="flex items-center justify-between px-4 h-16 max-w-3xl mx-auto w-full">
 					<Link
 						href="/"

@@ -18,6 +18,25 @@ export class RestaurantOrdersService {
     private readonly restaurantService: RestaurantService,
   ) {}
 
+  /** Retrieves an order by ID for a specific branch. */
+  async getOrderById(branchId: number, orderId: number) {
+    const order = await this.prisma.mvpOrder.findFirst({
+      where: {
+        id: orderId,
+        branchId,
+      },
+      include: {
+        items: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+
+    return order;
+  }
+
   /** Creates a local order and immediately exports its items to POS. */
   async createOrder(branchId: number, dto: CreateRestaurantOrderDto) {
     await this.restaurantService.assertBranchExists(branchId);
