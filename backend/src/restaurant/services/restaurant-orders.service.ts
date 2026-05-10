@@ -70,39 +70,83 @@ export class RestaurantOrdersService {
       throw new BadRequestException('Invalid delivery service for branch');
     }
 
+    const customerName = dto.customerName.trim();
+    const customerMobile = dto.customerMobile.trim();
+    const customerAddress = dto.customerAddress.trim();
+    const normalizedCustomerMobile =
+      this.normalizeCustomerPhone(customerMobile);
     const remarks = dto.remarks?.trim() ?? '';
 
-    const order = await this.prisma.mvpOrder.create({
-      data: {
-        branchId,
-        customerName: dto.customerName.trim(),
-        customerMobile: dto.customerMobile.trim(),
-        customerAddress: dto.customerAddress.trim(),
-        deliveryServiceCode: dto.deliveryServiceCode,
-        remarks: remarks || null,
-        total: dto.total,
-        items: {
-          create: dto.items.map((item) => {
-            const menuItem = menuItemsById.get(item.menuItemId)!;
-            const unitPrice = Number(menuItem.price);
-
-            return {
-              menuItemId: menuItem.id,
-              posOrderCode: menuItem.posOrderCode,
-              nameSnapshot: menuItem.name,
-              quantity: item.quantity,
-              unitPrice: menuItem.price,
-              totalPrice: unitPrice * item.quantity,
-            };
-          }),
+    const order = await this.prisma.$transaction(async (tx) => {
+      const customer = await tx.customer.upsert({
+        where: { phone: normalizedCustomerMobile },
+        update: {
+          phoneRaw: customerMobile,
+          name: customerName,
         },
-      },
-      include: { items: true },
+        create: {
+          phone: normalizedCustomerMobile,
+          phoneRaw: customerMobile,
+          name: customerName,
+        },
+      });
+
+      const customerAddressRecord = await tx.customerAddress.upsert({
+        where: {
+          customerId_address: {
+            customerId: customer.id,
+            address: customerAddress,
+          },
+        },
+        update: {
+          usageCount: { increment: 1 },
+          lastUsedAt: new Date(),
+        },
+        create: {
+          customerId: customer.id,
+          address: customerAddress,
+          usageCount: 1,
+          lastUsedAt: new Date(),
+        },
+      });
+
+      return tx.mvpOrder.create({
+        data: {
+          branchId,
+          customerId: customer.id,
+          customerAddressId: customerAddressRecord.id,
+          customerName,
+          customerMobile,
+          customerAddress,
+          deliveryServiceCode: dto.deliveryServiceCode,
+          remarks: remarks || null,
+          total: dto.total,
+          items: {
+            create: dto.items.map((item) => {
+              const menuItem = menuItemsById.get(item.menuItemId)!;
+              const unitPrice = Number(menuItem.price);
+              const itemRemarks = item.remarks?.trim() ?? '';
+
+              return {
+                menuItemId: menuItem.id,
+                posOrderCode: menuItem.posOrderCode,
+                nameSnapshot: menuItem.name,
+                quantity: item.quantity,
+                remarks: itemRemarks || null,
+                unitPrice: menuItem.price,
+                totalPrice: unitPrice * item.quantity,
+              };
+            }),
+          },
+        },
+        include: { items: true },
+      });
     });
 
     try {
       for (const item of dto.items) {
         const menuItem = menuItemsById.get(item.menuItemId)!;
+        const itemRemarks = item.remarks?.trim() ?? '';
 
         await this.posSqlService.addCustomerOrder({
           customerName: order.customerName,
@@ -111,7 +155,7 @@ export class RestaurantOrdersService {
           deliveryServiceCode: order.deliveryServiceCode,
           orderCode: menuItem.posOrderCode,
           orderQty: item.quantity,
-          orderRemarks: remarks,
+          orderRemarks: this.buildPosOrderRemarks(itemRemarks, remarks),
         });
       }
 
@@ -136,5 +180,40 @@ export class RestaurantOrdersService {
       });
       throw error;
     }
+  }
+
+  /** Combines per-item and whole-order notes for POS item export. */
+  private buildPosOrderRemarks(
+    itemRemarks: string,
+    orderRemarks: string,
+  ): string {
+    if (itemRemarks && orderRemarks) {
+      return `ملاحظة الصنف: ${itemRemarks} | ملاحظة الطلب: ${orderRemarks}`;
+    }
+
+    return itemRemarks || orderRemarks;
+  }
+
+  /** Normalizes customer phones before customer upsert. */
+  private normalizeCustomerPhone(phone: string): string {
+    const normalizedPhone = phone.trim();
+    if (!normalizedPhone) {
+      return normalizedPhone;
+    }
+
+    const cleaned = normalizedPhone.replace(/[^\d+]/g, '');
+    if (cleaned.startsWith('+20')) {
+      return cleaned;
+    }
+
+    if (cleaned.startsWith('20') && cleaned.length >= 12) {
+      return `+${cleaned}`;
+    }
+
+    if (cleaned.startsWith('01') && cleaned.length === 11) {
+      return `+20${cleaned.substring(1)}`;
+    }
+
+    return cleaned;
   }
 }

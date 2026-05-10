@@ -3,6 +3,7 @@ export const STORAGE_KEYS = {
   USER: "user_info",
   CUSTOMER_TRACKED_ORDERS: "customer_tracked_orders",
   CUSTOMER_CART: "customer_cart",
+  RESTAURANT_CUSTOMER_PROFILE: "restaurant_customer_profile",
 };
 
 export {

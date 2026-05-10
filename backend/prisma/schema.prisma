@@ -72,10 +72,45 @@ model DeliveryService {
   @@map("delivery_services")
 }
 
+model Customer {
+  id        Int               @id @default(autoincrement())
+  phone     String            @unique
+  phoneRaw  String?           @map("phone_raw")
+  name      String?
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+  addresses CustomerAddress[]
+  orders    MvpOrder[]
+
+  @@map("customers")
+}
+
+model CustomerAddress {
+  id         Int        @id @default(autoincrement())
+  customerId Int       @map("customer_id")
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  address    String
+  label      String?
+  usageCount Int       @default(1) @map("usage_count")
+  lastUsedAt DateTime  @default(now()) @map("last_used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+	deletedAt  DateTime?  @map("deleted_at")
+  orders     MvpOrder[]
+
+  @@unique([customerId, address], map: "customer_addresses_customer_address_key")
+  @@index([customerId], map: "customer_addresses_customer_id_idx")
+  @@map("customer_addresses")
+}
+
 model MvpOrder {
   id                 Int             @id @default(autoincrement())
   branchId           Int             @map("branch_id")
   branch             Branch          @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  customerId         Int             @map("customer_id")
+  customer           Customer        @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  customerAddressId  Int             @map("customer_address_id")
+  customerAddressRef CustomerAddress @relation(fields: [customerAddressId], references: [id], onDelete: Restrict)
   customerName       String          @map("customer_name")
   customerMobile     String          @map("customer_mobile")
   customerAddress    String          @map("customer_address")
@@ -90,6 +125,8 @@ model MvpOrder {
   items              MvpOrderItem[]
 
   @@index([branchId, status], map: "mvp_orders_branch_status_idx")
+  @@index([customerId], map: "mvp_orders_customer_id_idx")
+  @@index([customerAddressId], map: "mvp_orders_customer_address_id_idx")
   @@map("mvp_orders")
 }
 
@@ -102,6 +139,7 @@ model MvpOrderItem {
   posOrderCode Int     @map("pos_order_code")
   nameSnapshot String  @map("name_snapshot")
   quantity    Int  @default(1) 
+  remarks     String?
   unitPrice   Decimal  @db.Decimal(10, 2) @map("unit_price")
   totalPrice  Decimal  @db.Decimal(10, 2) @map("total_price")
   createdAt   DateTime @default(now()) @map("created_at")

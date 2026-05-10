@@ -25,6 +25,12 @@ export class CreateRestaurantOrderItemDto {
   @IsNumber()
   @Min(0.001)
   quantity: number;
+
+  @ApiProperty({ example: 'بدون سمسم', required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  remarks?: string;
 }
 
 /** DTO for creating a restaurant order from checkout. */
@@ -34,7 +40,7 @@ export class CreateRestaurantOrderDto {
   @MaxLength(120)
   customerName: string;
 
-  @ApiProperty({ example: '01143341684' })
+  @ApiProperty({ example: '01023314587' })
   @IsString()
   @MaxLength(32)
   customerMobile: string;

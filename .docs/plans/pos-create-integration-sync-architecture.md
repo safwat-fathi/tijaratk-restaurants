@@ -52,7 +52,7 @@ Current POS order write procedure discovered:
 ```sql
 EXECUTE dbo.PS_AddApplicationCustomerOrder
   'صفوت فتحي',
-  '01143341684',
+  '01023314587',
   'الحي4 - مجاورة7',
   50,
   100;

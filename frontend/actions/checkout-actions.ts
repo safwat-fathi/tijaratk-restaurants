@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { clearCartCookie } from "@/lib/cart/customer-cart-cookie";
+import { upsertRestaurantCustomerProfileInCookie } from "@/lib/customer/restaurant-customer-cookie";
 
 type CheckoutOrderState = {
 	success: boolean;
@@ -12,6 +13,19 @@ type CheckoutOrderState = {
 type CheckoutOrderItem = {
 	menuItemId: number;
 	quantity: number;
+	remarks?: string;
+};
+
+export type CheckoutCustomerLookupAddress = {
+	id: string;
+	address: string;
+	lastUsedAt: string;
+};
+
+export type CheckoutCustomerLookupResult = {
+	name?: string;
+	phone: string;
+	addresses: CheckoutCustomerLookupAddress[];
 };
 
 const getRequiredString = (formData: FormData, key: string) => {
@@ -44,17 +58,95 @@ const getOrderItems = (formData: FormData): CheckoutOrderItem[] => {
 			const record = item as Record<string, unknown>;
 			const menuItemId = Number(record.menuItemId);
 			const quantity = Number(record.quantity);
+			const remarks =
+				typeof record.remarks === "string" ? record.remarks.trim().slice(0, 200) : "";
 
 			if (!Number.isInteger(menuItemId) || menuItemId <= 0 || quantity <= 0) {
 				return [];
 			}
 
-			return [{ menuItemId, quantity }];
+			return [{ menuItemId, quantity, ...(remarks ? { remarks } : {}) }];
 		});
 	} catch {
 		return [];
 	}
 };
+
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
+};
+
+const normalizeLookupResponse = (
+	value: unknown,
+): CheckoutCustomerLookupResult | null => {
+	if (!isRecord(value)) {
+		return null;
+	}
+
+	const rawAddresses = Array.isArray(value.addresses) ? value.addresses : [];
+	const addresses = rawAddresses.flatMap((item): CheckoutCustomerLookupAddress[] => {
+		if (!isRecord(item)) {
+			return [];
+		}
+
+		const id = typeof item.id === "string" ? item.id.trim() : "";
+		const address = typeof item.address === "string" ? item.address.trim() : "";
+		const lastUsedAt =
+			typeof item.lastUsedAt === "string" ? item.lastUsedAt.trim() : "";
+
+		if (!id || !address || !lastUsedAt) {
+			return [];
+		}
+
+		return [{ id, address, lastUsedAt }];
+	});
+
+	const phone = typeof value.phone === "string" ? value.phone.trim() : "";
+	if (!phone && addresses.length === 0) {
+		return null;
+	}
+
+	return {
+		name: typeof value.name === "string" ? value.name.trim() || undefined : undefined,
+		phone,
+		addresses,
+	};
+};
+
+export async function lookupCheckoutCustomerAction(
+	branchId: string,
+	phone: string,
+): Promise<{ success: boolean; data?: CheckoutCustomerLookupResult }> {
+	const normalizedBranchId = branchId.trim();
+	const normalizedPhone = phone.trim();
+
+	if (!normalizedBranchId || !normalizedPhone) {
+		return { success: false };
+	}
+
+	try {
+		const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+		const params = new URLSearchParams({ phone: normalizedPhone });
+		const response = await fetch(
+			`${baseUrl}/branches/${normalizedBranchId}/customers/lookup?${params.toString()}`,
+			{ cache: "no-store" },
+		);
+
+		if (!response.ok) {
+			return { success: false };
+		}
+
+		const payload = (await response.json()) as unknown;
+		const data = isRecord(payload) && "data" in payload ? payload.data : payload;
+		const normalizedData = normalizeLookupResponse(data);
+
+		return normalizedData
+			? { success: true, data: normalizedData }
+			: { success: false };
+	} catch {
+		return { success: false };
+	}
+}
 
 export async function submitCheckoutOrderAction(
 	_prevState: CheckoutOrderState,
@@ -127,6 +219,15 @@ export async function submitCheckoutOrderAction(
 	}
 
 	await clearCartCookie();
+	try {
+		await upsertRestaurantCustomerProfileInCookie({
+			name: customerName,
+			phone: customerMobile,
+			address: customerAddress,
+		});
+	} catch {
+		// Cookie persistence should not block a successfully created order.
+	}
 
 	const params = new URLSearchParams({
 		branchId,

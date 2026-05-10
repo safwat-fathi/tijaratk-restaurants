@@ -1,0 +1,2 @@
+ALTER TABLE mvp_order_items
+ADD COLUMN IF NOT EXISTS remarks TEXT;
