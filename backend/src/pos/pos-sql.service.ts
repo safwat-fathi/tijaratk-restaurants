@@ -119,11 +119,11 @@ export class PosSqlService implements OnModuleDestroy {
     }
 
     const config: SqlConfig = {
-      server: process.env.POS_DB_HOST,
+      server: this.getRequiredEnv('POS_DB_HOST'),
       port: Number(process.env.POS_DB_PORT || 1433),
-      user: process.env.POS_DB_USER,
-      password: process.env.POS_DB_PASS,
-      database: process.env.POS_DB_NAME,
+      user: this.getRequiredEnv('POS_DB_USER'),
+      password: this.getRequiredEnv('POS_DB_PASS'),
+      database: this.getRequiredEnv('POS_DB_NAME'),
       options: {
         encrypt: process.env.POS_DB_ENCRYPT === 'true',
         trustServerCertificate: process.env.POS_DB_TRUST_CERT !== 'false',
@@ -132,5 +132,16 @@ export class PosSqlService implements OnModuleDestroy {
 
     this.pool = await new ConnectionPool(config).connect();
     return this.pool;
+  }
+
+  /** Returns a required environment variable or fails with a clear config error. */
+  private getRequiredEnv(name: string): string {
+    const value = process.env[name];
+
+    if (!value) {
+      throw new Error(`Missing required environment variable: ${name}`);
+    }
+
+    return value;
   }
 }
