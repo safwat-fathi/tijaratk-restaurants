@@ -15,7 +15,13 @@ export class PrismaService
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
     });
-    super({ adapter });
+    super({
+      adapter,
+      log:
+        process.env.NODE_ENV === 'development'
+          ? ['query', 'error', 'warn']
+          : ['error'],
+    });
   }
 
   /**

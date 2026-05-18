@@ -144,20 +144,20 @@ export class RestaurantOrdersService {
     });
 
     try {
-      for (const item of dto.items) {
-        const menuItem = menuItemsById.get(item.menuItemId)!;
-        const itemRemarks = item.remarks?.trim() ?? '';
-
-        await this.posSqlService.addCustomerOrder({
-          customerName: order.customerName,
-          customerMobile: order.customerMobile,
-          customerAddress: order.customerAddress,
-          deliveryServiceCode: order.deliveryServiceCode,
-          orderCode: menuItem.posOrderCode,
-          orderQty: item.quantity,
-          orderRemarks: this.buildPosOrderRemarks(itemRemarks, remarks),
-        });
-      }
+      await this.posSqlService.addCustomerOrder({
+        customerName: order.customerName,
+        customerMobile: order.customerMobile,
+        customerAddress: order.customerAddress,
+        deliveryServiceCode: order.deliveryServiceCode,
+        onlineInvoiceCode: order.id,
+        invoiceRemarks: remarks,
+        items: order.items.map((item) => ({
+          onlineInvoiceId: order.id,
+          orderCode: item.posOrderCode,
+          quantity: item.quantity,
+          remarks: item.remarks ?? '',
+        })),
+      });
 
       return this.prisma.mvpOrder.update({
         where: { id: order.id },
@@ -180,18 +180,6 @@ export class RestaurantOrdersService {
       });
       throw error;
     }
-  }
-
-  /** Combines per-item and whole-order notes for POS item export. */
-  private buildPosOrderRemarks(
-    itemRemarks: string,
-    orderRemarks: string,
-  ): string {
-    if (itemRemarks && orderRemarks) {
-      return `ملاحظة الصنف: ${itemRemarks} | ملاحظة الطلب: ${orderRemarks}`;
-    }
-
-    return itemRemarks || orderRemarks;
   }
 
   /** Normalizes customer phones before customer upsert. */

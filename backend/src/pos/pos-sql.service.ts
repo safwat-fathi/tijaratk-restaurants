@@ -45,27 +45,71 @@ export class PosSqlService implements OnModuleDestroy {
     return result.recordset;
   }
 
-  /** Exports one single-item customer order into POS. */
+  /** Exports one full customer order into POS. */
   async addCustomerOrder(params: {
     customerName: string;
     customerMobile: string;
     customerAddress: string;
     deliveryServiceCode: number;
-    orderCode: number;
-    orderQty: number;
-    orderRemarks: string;
+    onlineInvoiceCode: number;
+    invoiceRemarks: string;
+    items: Array<{
+      onlineInvoiceId: number;
+      orderCode: number;
+      quantity: number;
+      remarks: string;
+    }>;
   }): Promise<void> {
     const pool = await this.getPool();
+    const xmlData = this.buildApplicationOrderXml(params.items);
+
     await pool
       .request()
       .input('CustomerName', params.customerName)
       .input('CustomerMobile', params.customerMobile)
       .input('CustomerAddress', params.customerAddress)
       .input('DeliveryServiceCode', params.deliveryServiceCode)
-      .input('OrderCode', params.orderCode)
-      .input('OrderQty', params.orderQty)
-      .input('OrderRemarks', params.orderRemarks)
+      .input('OnLineInvoiceCode', params.onlineInvoiceCode)
+      .input('InvoiceRemarks', params.invoiceRemarks)
+      .input('xmlData', xmlData)
       .execute('dbo.PS_AddApplicationCustomerOrder');
+  }
+
+  /** Builds the POS XML payload in memory without creating temporary files. */
+  private buildApplicationOrderXml(
+    items: Array<{
+      onlineInvoiceId: number;
+      orderCode: number;
+      quantity: number;
+      remarks: string;
+    }>,
+  ): string {
+    const rows = items
+      .map(
+        (item) => `
+        <ROW>
+          <AO_OnLineInvoiceID>${item.onlineInvoiceId}</AO_OnLineInvoiceID>
+          <AO_OrderCode>${item.orderCode}</AO_OrderCode>
+          <AO_Qty>${item.quantity}</AO_Qty>
+          <AO_Remarks>${this.escapeXml(item.remarks)}</AO_Remarks>
+        </ROW>`,
+      )
+      .join('');
+
+    return `<ROOT>
+      <PS_ApplicationOrder>${rows}
+      </PS_ApplicationOrder>
+    </ROOT>`;
+  }
+
+  /** Escapes free-text values before embedding them in XML text nodes. */
+  private escapeXml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
   }
 
   /** Lazily creates a reusable SQL Server connection pool. */
